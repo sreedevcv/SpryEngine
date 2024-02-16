@@ -1,0 +1,12 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "spryengine.exe (C:\\Users\\SHARIHA3\\source\\repos\\SpryEngine\\spryengine.exe)",
+      "name": "spryengine.exe (C:\\Users\\SHARIHA3\\source\\repos\\SpryEngine\\spryengine.exe)"
+    }
+  ]
+}

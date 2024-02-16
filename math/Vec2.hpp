@@ -1,21 +1,17 @@
 #pragma once
 
 namespace spry {
+    template<class T=float>
+    class Vec2 {
+    public:
+        T x;
+        T y;
 
-template<class T>
-class Vec2 {
-public:
-    T mX;
-    T mY;
+        Vec2(T x, T y);
+        ~Vec2() = default;
+    };
 
-    void Vec2<T>(T T, T x, T y);
-    ~Vec2() = default;
-};
-
-template<class T>
-T dot(Vec2<T> a, Vec2<T> b);
-
-template<class T>
-Vec2<T> cross(Vec2<T> a, Vec2<T> b);
-
+    template<class T>
+    T dot(Vec2<T> a, Vec2<T> b);
 }
+

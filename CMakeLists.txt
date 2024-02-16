@@ -7,6 +7,7 @@ include(FetchContent)
 
 
 # GLFW
+#[[
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -17,6 +18,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
+]]
 
 # IMGUI
 # include_directories(deps/imgui)
@@ -42,27 +44,25 @@ FetchContent_MakeAvailable(glfw)
 # set(BUILD_SHARED_LIBS ON)
 # FetchContent_MakeAvailable(glm)
 
-add_library(math STATIC
-    math/Vec2.cpp
-)
 
-
-find_package(OpenGL REQUIRED)
+#find_package(OpenGL REQUIRED)
 
 include_directories("include")
-include_directories(src)
+include_directories("math")
+include_directories("common")
 
 add_executable(
     spryengine
     main.cpp
     renderer/glad.c
+    math/Vec2.cpp
+    common/Entity.cpp 
 )
 
-target_link_libraries(
-    spryengine
-    OpenGL::GL
-    math
-)
+#target_link_libraries(
+ #   spryengine
+#    OpenGL::GL
+#)
 
 # target_link_libraries(
 #     spryengine
