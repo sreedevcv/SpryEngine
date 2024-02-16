@@ -53,10 +53,13 @@ include_directories("common")
 
 add_executable(
     spryengine
-    main.cpp
-    renderer/glad.c
-    math/Vec2.cpp
-    common/Entity.cpp 
+    "main.cpp"
+    "renderer/glad.c"
+    "math/Vec2.cpp"
+    "math/Mat4.cpp"
+    "common/Entity.cpp"
+    "common/Rect.cpp"
+    "math/Mat4.cpp"
 )
 
 #target_link_libraries(

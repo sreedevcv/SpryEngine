@@ -9,10 +9,23 @@ namespace spry {
 		Vec2<T> mPosition;
 
 	public:
-		Entity(Vec2<T> position);
-		~Entity() = default;
+		Entity(Vec2<T> position)
+			: mPosition(position)
+		{}
 
-		void setPosition(Vec2<T>& position);
-		Vec2<T>& getPosition();
+		virtual ~Entity() = default;
+
+		void setPosition(Vec2<T>& position)
+		{
+			mPosition = position;
+		}
+
+		Vec2<T>& getPosition()
+		{
+			return mPosition;
+		}
+
+		virtual void draw() = 0;
+		virtual void update(float deltaTime) = 0;
 	};
 }

@@ -7,10 +7,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "utils.hpp"
+#include "Mat4.hpp"
 
 
 class Shader {
@@ -22,6 +21,6 @@ public:
 
     void compile(const char *vert_shader, const char *frag_shader);
     void use();
-    void set_uniform_matrix(const char *name, glm::mat4& value);
+    void set_uniform_matrix(const char *name, spry::Mat4& value);
     void set_uniform_float(const char *name, float value);
 };
