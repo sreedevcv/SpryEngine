@@ -1,7 +1,8 @@
 #include "Window.hpp"
 
-spry::Window::Window(int width, int height, const char *title)
-    : mWidth(width), mHeight(height)
+spry::Window::Window(int width, int height, const char* title)
+    : mWidth(width)
+    , mHeight(height)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -10,24 +11,21 @@ spry::Window::Window(int width, int height, const char *title)
 
     mWindow = glfwCreateWindow(mWidth, mHeight, title, nullptr, nullptr);
 
-    if (mWindow == nullptr) 
-    {
+    if (mWindow == nullptr) {
         std::cout << "Failed to load window\n";
         glfwTerminate();
         std::exit(-1);
     }
 
-    const auto framebufferSizeCallback = [](GLFWwindow *window, int width, int height)
-    {
+    const auto framebufferSizeCallback = [](GLFWwindow* window, int width, int height) {
         glViewport(0, 0, width, height);
     };
 
     glfwMakeContextCurrent(mWindow);
     glfwSetWindowUserPointer(mWindow, this);
     glfwSetFramebufferSizeCallback(mWindow, framebufferSizeCallback);
-    
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
         std::exit(-1);
     }
@@ -50,8 +48,7 @@ void spry::Window::start()
 {
     double prevTime = glfwGetTime();
 
-    while (!glfwWindowShouldClose(mWindow))
-    {
+    while (!glfwWindowShouldClose(mWindow)) {
         double currTime = glfwGetTime();
         float deltaTime = static_cast<float>(currTime - prevTime);
         prevTime = currTime;
@@ -66,8 +63,7 @@ void spry::Window::start()
 
 bool spry::Window::isPressed(int key)
 {
-    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
+    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         return true;
     }
     return false;

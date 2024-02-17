@@ -61,6 +61,9 @@ add_executable(
     "common/Rect.cpp"
     "math/Mat4.cpp"
     "renderer/Window.cpp"
+    "renderer/Shader.cpp"
+    "renderer/Cuboid.cpp"
+    "renderer/Tetrahedron.cpp"
 )
 
 target_link_libraries(

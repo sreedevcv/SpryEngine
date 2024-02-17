@@ -5,15 +5,21 @@
 #include "Shader.hpp"
 #include "utils.hpp"
 
+namespace spry {
+
 class Cuboid {
 private:
     GLuint VAO, VBO, EBO;
+    spry::Shader& mShader;
+
+    void initBuffers();
 
 public:
-    Shader basic_shader;
 
-    Cuboid();
+    Cuboid(spry::Shader& shader);
     ~Cuboid();
 
     void draw();
 };
+
+}

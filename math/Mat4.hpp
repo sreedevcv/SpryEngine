@@ -4,7 +4,7 @@
 #include <cstring>
 
 namespace spry {
-	template<typename T=float>
+	template<class T=float>
 	class Mat4 {
 	public:
 		std::array<T, 16> values;
@@ -19,5 +19,9 @@ namespace spry {
 		}
 
 		~Mat4() = default;
+
+		T* getData() {
+			return values.data();
+		}
 	};
 };

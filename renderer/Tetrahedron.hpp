@@ -1,20 +1,25 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/mat4x4.hpp>
 
 #include "Shader.hpp"
 #include  "utils.hpp"
+
+namespace spry {
 
 class Tetrahedron {
 private:
     unsigned int VAO, VBO, EBO;
 
-public:
-    Shader basic_shader;
+    void initBuffers();
 
-    Tetrahedron();
+public:
+    spry::Shader& mShader;
+
+    Tetrahedron(Shader& shader);
     ~Tetrahedron();
 
     void draw();
 };
+
+}

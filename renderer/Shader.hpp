@@ -11,16 +11,22 @@
 #include "utils.hpp"
 #include "Mat4.hpp"
 
+namespace spry {
 
 class Shader {
 private:
     unsigned int ID;
+    const char* mVertShaderSource;
+    const char* mFragShaderSource;
+    bool mHasCompiled = false;
+
 public:
-    Shader() = default;
+    Shader(const char* vertShaderSource, const char* fragShaderSource);
     ~Shader();
 
-    void compile(const char *vert_shader, const char *frag_shader);
+    void compile();
     void use();
-    void set_uniform_matrix(const char *name, spry::Mat4& value);
-    void set_uniform_float(const char *name, float value);
+    void setUniformMatrix(const char *name, spry::Mat4<float>& value);
+    void setUniformFloat(const char *name, float value);
 };
+}

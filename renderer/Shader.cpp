@@ -1,83 +1,100 @@
 #include "Shader.hpp"
 
-Shader::~Shader() {
+spry::Shader::Shader(const char* vertShaderSource, const char* fragShaderSource)
+    : mVertShaderSource(vertShaderSource)
+    , mFragShaderSource(fragShaderSource)
+    , mHasCompiled(false)
+{
+}
+
+spry::Shader::~Shader()
+{
     glDeleteProgram(ID);
 }
 
-void Shader::compile(const char *vert_source, const char *frag_source) {
-    std::ifstream vert_file;
-    std::ifstream frag_file;
+void spry::Shader::compile()
+{
+    if (mHasCompiled) {
+        return;
+    }
 
-    vert_file.open(vert_source);
-    frag_file.open(frag_source);
+    mHasCompiled = true;
 
-    std::stringstream vert_stream;
-    std::stringstream frag_stream;
-    vert_stream << vert_file.rdbuf();
-    frag_stream << frag_file.rdbuf();
+    std::ifstream vertFile;
+    std::ifstream fragFile;
 
-    std::string vert_code = vert_stream.str();
-    std::string frag_code = frag_stream.str();
+    vertFile.open(mVertShaderSource);
+    fragFile.open(mFragShaderSource);
 
-    const char *vert_code_str = vert_code.c_str();
-    const char *frag_code_str = frag_code.c_str();
+    std::stringstream vertStream;
+    std::stringstream fragStream;
+    vertStream << vertFile.rdbuf();
+    fragStream << fragFile.rdbuf();
 
-    const auto get_error = [&](unsigned int shader, bool is_vert_shader = true, bool is_program = false) {
+    std::string vertCode = vertStream.str();
+    std::string fragCode = fragStream.str();
+
+    const char* vertCodeStr = vertCode.c_str();
+    const char* fragCodeStr = fragCode.c_str();
+
+    const auto getError = [&](unsigned int shader, bool is_vert_shader = true, bool is_program = false) {
         int success;
         char log[512];
         if (is_program) {
             glGetProgramiv(ID, GL_LINK_STATUS, &success);
-        }
-        else {
+        } else {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         }
 
         if (!success) {
             if (is_program) {
                 glGetProgramInfoLog(ID, 512, nullptr, log);
-                std::cout << "[ERROR]::" << "LINK" << "::\n";
-            }
-            else {
+                std::cout << "[ERROR]::"
+                          << "LINK"
+                          << "::\n";
+            } else {
                 glGetShaderInfoLog(shader, 512, nullptr, log);
                 std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::\n";
             }
             std::cout << log << std::endl;
         }
-
     };
 
-    unsigned int vert_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert_shader, 1, &vert_code_str, nullptr);
-    glCompileShader(vert_shader);
-    get_error(vert_shader);
+    unsigned int vertShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertShader, 1, &vertCodeStr, nullptr);
+    glCompileShader(vertShader);
+    getError(vertShader);
 
-    unsigned int frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag_shader, 1, &frag_code_str, nullptr);
-    glCompileShader(frag_shader);
-    get_error(frag_shader, false);
+    unsigned int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragShader, 1, &fragCodeStr, nullptr);
+    glCompileShader(fragShader);
+    getError(fragShader, false);
 
     ID = glCreateProgram();
-    glAttachShader(ID, vert_shader);
-    glAttachShader(ID, frag_shader);
+    glAttachShader(ID, vertShader);
+    glAttachShader(ID, fragShader);
     glLinkProgram(ID);
-    get_error(ID, false, true);
+    getError(ID, false, true);
 
-    glDeleteShader(vert_shader);
-    glDeleteShader(frag_shader);
+    glDeleteShader(vertShader);
+    glDeleteShader(fragShader);
 
     check_for_opengl_error();
 }
 
-void Shader::use() {
+void spry::Shader::use()
+{
     glUseProgram(ID);
 }
 
-void Shader::set_uniform_matrix(const char *name, spry::Mat4& value) {
+void spry::Shader::setUniformMatrix(const char* name, spry::Mat4<float>& value)
+{
     int loc = glGetUniformLocation(ID, name);
-    glUniformMatrix4fv(loc, 1, GL_FALSE, &value.data);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, value.getData());
 }
 
-void Shader::set_uniform_float(const char *name, float value) {
+void spry::Shader::setUniformFloat(const char* name, float value)
+{
     int loc = glGetUniformLocation(ID, name);
     glUniform1f(loc, value);
     // glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));

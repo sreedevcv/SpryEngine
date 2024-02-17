@@ -1,6 +1,14 @@
 #include "Cuboid.hpp"
 
-Cuboid::Cuboid() {
+spry::Cuboid::Cuboid(spry::Shader& shader) 
+    : mShader(shader)
+{
+    initBuffers();
+    mShader.compile();
+    check_for_opengl_error();
+}
+
+void spry::Cuboid::initBuffers() {
     constexpr float vertices[] =  {
         // positions        // colours
         -0.5f, 0.5f, 0.5f,  1.0f, 1.0f, 1.0f, 0.1f, // front top left
@@ -48,18 +56,15 @@ Cuboid::Cuboid() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    basic_shader.compile("res/shaders/basic.vert", "res/shaders/basic.frag");
-    check_for_opengl_error();
 }
 
-Cuboid::~Cuboid() {
+spry::Cuboid::~Cuboid() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &EBO);
 }
 
-void Cuboid::draw() {
-    basic_shader.use();
+void spry::Cuboid::draw() {
+    mShader.use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
