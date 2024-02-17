@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstring>
 
 namespace spry {
 	template<typename T=float>

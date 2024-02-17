@@ -7,7 +7,6 @@ include(FetchContent)
 
 
 # GLFW
-#[[
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -18,7 +17,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
-]]
+
 
 # IMGUI
 # include_directories(deps/imgui)
@@ -45,11 +44,12 @@ FetchContent_MakeAvailable(glfw)
 # FetchContent_MakeAvailable(glm)
 
 
-#find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 
 include_directories("include")
 include_directories("math")
 include_directories("common")
+include_directories("renderer")
 
 add_executable(
     spryengine
@@ -60,12 +60,14 @@ add_executable(
     "common/Entity.cpp"
     "common/Rect.cpp"
     "math/Mat4.cpp"
+    "renderer/Window.cpp"
 )
 
-#target_link_libraries(
- #   spryengine
-#    OpenGL::GL
-#)
+target_link_libraries(
+   spryengine
+   OpenGL::GL
+   glfw
+)
 
 # target_link_libraries(
 #     spryengine
