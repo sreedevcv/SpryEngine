@@ -64,6 +64,7 @@ add_executable(
     "renderer/Shader.cpp"
     "renderer/Cuboid.cpp"
     "renderer/Tetrahedron.cpp"
+    "renderer/Texture.cpp"
 )
 
 target_link_libraries(

@@ -1,12 +1,12 @@
 #include "Texture.hpp"
 
-Texture::Texture() {
+spry::Texture::Texture() {
 }
 
-Texture::~Texture() {
+spry::Texture::~Texture() {
 }
 
-void Texture::load_texture(void *data, int width, int height) {
+void spry::Texture::load_texture(void *data, int width, int height) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -17,7 +17,7 @@ void Texture::load_texture(void *data, int width, int height) {
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture::bind(int tex_count) {
+void spry::Texture::bind(int tex_count) {
     glActiveTexture(GL_TEXTURE0 + tex_count);
     glBindTexture(GL_TEXTURE_2D, texture);
 }

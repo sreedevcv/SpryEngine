@@ -5,28 +5,26 @@
 
 #include <iostream>
 
-namespace spry
-{
-    class Window
-    {
-    private:
-        int mWidth;
-        int mHeight;
+namespace spry {
+class Window {
+private:
+    int mWidth;
+    int mHeight;
 
-        GLFWwindow *mWindow;
-    
-    protected:
-        virtual void processInput(float deltaTime) = 0;
-        virtual void updateFrame(float deltaTime) = 0;
+    GLFWwindow* mWindow;
 
-    public:
-        Window(int width, int height, const char* title);
-        virtual ~Window();
+protected:
+    virtual void processInput(float deltaTime) = 0;
+    virtual void updateFrame(float deltaTime) = 0;
 
-        void start();
-        bool isPressed(int key);
+public:
+    Window(int width, int height, const char* title);
+    virtual ~Window();
 
-        void closeWindow();
-    };
-    
+    void start();
+    bool isPressed(int key);
+
+    void closeWindow();
+};
+
 } // namespace spry

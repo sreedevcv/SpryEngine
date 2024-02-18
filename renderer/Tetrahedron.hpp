@@ -3,7 +3,7 @@
 #include <glad/glad.h>
 
 #include "Shader.hpp"
-#include  "utils.hpp"
+#include "utils.hpp"
 
 namespace spry {
 

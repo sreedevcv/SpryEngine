@@ -1,15 +1,15 @@
-#pragma once 
+#pragma once
 
-#include <string>
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "utils.hpp"
 #include "Mat4.hpp"
+#include "utils.hpp"
 
 namespace spry {
 
@@ -26,7 +26,7 @@ public:
 
     void compile();
     void use();
-    void setUniformMatrix(const char *name, spry::Mat4<float>& value);
-    void setUniformFloat(const char *name, float value);
+    void setUniformMatrix(const char* name, spry::Mat4<float>& value);
+    void setUniformFloat(const char* name, float value);
 };
 }

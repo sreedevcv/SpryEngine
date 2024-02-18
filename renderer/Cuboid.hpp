@@ -15,7 +15,6 @@ private:
     void initBuffers();
 
 public:
-
     Cuboid(spry::Shader& shader);
     ~Cuboid();
 
