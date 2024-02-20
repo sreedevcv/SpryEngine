@@ -64,7 +64,7 @@ add_executable(
     "renderer/Shader.cpp"
     "renderer/Cuboid.cpp"
     "renderer/Tetrahedron.cpp"
-)
+ "math/Vec3.cpp")
 
 target_link_libraries(
    spryengine
