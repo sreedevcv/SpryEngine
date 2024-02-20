@@ -1,4 +1,6 @@
 build/
+out/
+Debug/
 spryengine
 spryengine.exe
 spryengine.ilk

@@ -16,7 +16,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
-include_directories(glfw3)
+# include_directories(glfw3)
 
 # MATH
 include_directories("math")
@@ -40,27 +40,20 @@ add_library(renderer
     "renderer/Shader.cpp"
     "renderer/Cuboid.cpp"
     "renderer/Tetrahedron.cpp"
-    "renderer/Texture.cpp"
-    "renderer/Mesh.cpp"
     "renderer/glad.c"
 )
-target_link_libraries(
-    renderer
+target_link_libraries(renderer
     glfw
 )
 
 
-find_package(OpenGL REQUIRED)
 include_directories("include")
-
-add_executable(
-    spryengine
+add_executable(spryengine
     "main.cpp"
 )
 
 target_link_libraries(
    spryengine
-   OpenGL::GL
    renderer
    math
    common

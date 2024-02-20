@@ -9,8 +9,9 @@
     "",
     "\\common",
     "\\include",
-    "\\math"
+    "\\math",
+    "\\renderer"
   ],
-  "SelectedNode": "\\CMakeLists.txt",
+  "SelectedNode": "\\renderer\\Camera.cpp",
   "PreviewInSolutionExplorer": false
 }
