@@ -27,4 +27,4 @@ public:
     void closeWindow();
 };
 
-} // namespace spry
+}
