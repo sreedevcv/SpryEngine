@@ -57,6 +57,8 @@ void spry::Cuboid::initBuffers()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    check_for_opengl_error();
 }
 
 spry::Cuboid::~Cuboid()

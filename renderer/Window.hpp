@@ -8,8 +8,8 @@
 namespace spry {
 class Window {
 private:
-    int mWidth;
-    int mHeight;
+    int m_width;
+    int m_height;
 
     GLFWwindow* mWindow;
 

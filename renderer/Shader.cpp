@@ -39,7 +39,7 @@ void spry::Shader::compile()
 
     const auto getError = [&](unsigned int shader, bool is_vert_shader = true, bool is_program = false) {
         int success;
-        char log[512];
+        char log[1024];
         if (is_program) {
             glGetProgramiv(ID, GL_LINK_STATUS, &success);
         } else {
@@ -48,13 +48,11 @@ void spry::Shader::compile()
 
         if (!success) {
             if (is_program) {
-                glGetProgramInfoLog(ID, 512, nullptr, log);
-                std::cout << "[ERROR]::"
-                          << "LINK"
-                          << "::\n";
+                glGetProgramInfoLog(ID, 1024, nullptr, log);
+                std::cout << "[ERROR]::LINK::";
             } else {
-                glGetShaderInfoLog(shader, 512, nullptr, log);
-                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::\n";
+                glGetShaderInfoLog(shader, 1024, nullptr, log);
+                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::";
             }
             std::cout << log << std::endl;
         }

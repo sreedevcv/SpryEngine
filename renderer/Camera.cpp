@@ -1,66 +1,66 @@
 #include "Camera.hpp"
 
-Camera::Camera(const int scr_width, const int scr_height)
-    : width(scr_width),
-      height(scr_height) 
+spry::Camera::Camera(const int scr_width, const int scr_height)
+    : m_width(scr_width),
+      m_height(scr_height) 
 {
-	mouse_data.last_x = width / 2;
-	mouse_data.last_y = height / 2;
+	mouse_data.last_x = m_width / 2;
+	mouse_data.last_y = m_height / 2;
 	update_camera_vectors();
 }
 
-glm::mat4 Camera::get_view_matrix() {
-    return glm::lookAt(position, position + front, up);
+spry::Mat4<float> spry::Camera::get_view_matrix() {
+    return spry::lookAt(m_position, (m_position + m_front), m_up);
 }
 
-void Camera::update_camera_vectors() {
-	glm::vec3 updated_font;
-	updated_font.x = std::cos(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-	updated_font.y = std::sin(glm::radians(pitch));
-	updated_font.z = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
-	front = glm::normalize(updated_font);
+void spry::Camera::update_camera_vectors() {
+	spry::Vec3<float> updated_font;
+	updated_font.x = std::cos(spry::radians(m_yaw)) * std::cos(spry::radians(m_pitch));
+	updated_font.y = std::sin(spry::radians(m_pitch));
+	updated_font.z = std::sin(spry::radians(m_yaw)) * std::cos(spry::radians(m_pitch));
+	m_front = spry::norm(updated_font);
 
-	right = glm::normalize(glm::cross(front, up));
-	up = glm::normalize(glm::cross(right, front));
+	m_right = spry::norm(spry::cross(m_front, m_up));
+	m_up = spry::norm(spry::cross(m_right, m_front));
 }
 
 
-void Camera::process_movement(movement m, float delta_time) {
-	float velocity = speed * delta_time;
+void spry::Camera::process_movement(movement m, float delta_time) {
+	float velocity = m_speed * delta_time;
 
 	switch (m) {
 	case movement::FORWARD:
-		position += front * velocity;
+		m_position += m_front * velocity;
 		break;
 	
 	case movement::BACKWARD:
-		position -= front * velocity;
+		m_position -= m_front * velocity;
 		break;
 
 	case movement::LEFT:
-		position -= right * velocity;
+		m_position -= m_right * velocity;
 		break;
 	
 	case movement::RIGHT:
-		position += right * velocity;
+		m_position += m_right * velocity;
 		break;
 	}
 }
 
-void Camera::process_mouse_movement(float x_offset, float y_offset, bool constrain_pitch) {
+void spry::Camera::process_mouse_movement(float x_offset, float y_offset, bool constrain_pitch) {
 	if (!mouse_data.captured) return;
 
-	x_offset *= mouse_sensitivity;
-	y_offset *= mouse_sensitivity;
+	x_offset *= m_mouse_sensitivity;
+	y_offset *= m_mouse_sensitivity;
 
-	yaw += x_offset;
-	pitch += y_offset;
+	m_yaw += x_offset;
+	m_pitch += y_offset;
 
 	if (constrain_pitch) {
-		if (pitch > 89.0f) {
-			pitch = 89.0f;
-		} else if (pitch < -89.0f) {
-			pitch = -89.0f;
+		if (m_pitch > 89.0f) {
+			m_pitch = 89.0f;
+		} else if (m_pitch < -89.0f) {
+			m_pitch = -89.0f;
 		}
 	}
 
@@ -69,17 +69,17 @@ void Camera::process_mouse_movement(float x_offset, float y_offset, bool constra
 	update_camera_vectors();
 }
 
-void Camera::process_mouse_scroll(float y_offset) {
-	zoom -= y_offset;
+void spry::Camera::process_mouse_scroll(float y_offset) {
+	m_zoom -= y_offset;
 
-	if (zoom < 0.1f) {
-		zoom = 0.1f;
-	} else if (zoom > 45.0f) {
-		zoom = 45.0f;
+	if (m_zoom < 0.1f) {
+		m_zoom = 0.1f;
+	} else if (m_zoom > 45.0f) {
+		m_zoom = 45.0f;
 	}
 }
 
-// void Camera::create(const int scr_width, const int scr_height) {
+// void spry::Camera::create(const int scr_width, const int scr_height) {
 //     width = scr_width;
 //     height = scr_height;
 // }

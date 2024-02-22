@@ -1,6 +1,6 @@
-#include "Mesh.hpp"
+#include "BasicMesh.hpp"
 
-spry::Mesh::Mesh(Shader& shader, std::span<float> vertices, std::span<int> indices, std::span<int> format)
+spry::BasicMesh::BasicMesh(Shader& shader, std::span<float> vertices, std::span<int> indices, std::span<int> format)
     : mVertexCount(indices.size())
     , mShader(shader)
 {
@@ -22,19 +22,19 @@ spry::Mesh::Mesh(Shader& shader, std::span<float> vertices, std::span<int> indic
     long prevAttribSize = 0;
     for (int i = 0; i < format.size(); i++) {
         int attribSize = format[i];
-        glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)prevAttribSize);
+        glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(prevAttribSize * sizeof(float)));
         glEnableVertexAttribArray(i);
         prevAttribSize += attribSize;
     }
 }
 
-spry::Mesh::~Mesh()
+spry::BasicMesh::~BasicMesh()
 {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &EBO);
 }
 
-void spry::Mesh::draw()
+void spry::BasicMesh::draw()
 {
     mShader.use();
     glBindVertexArray(VAO);

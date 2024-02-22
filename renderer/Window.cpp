@@ -1,15 +1,15 @@
 #include "Window.hpp"
 
 spry::Window::Window(int width, int height, const char* title)
-    : mWidth(width)
-    , mHeight(height)
+    : m_width(width)
+    , m_height(height)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    mWindow = glfwCreateWindow(mWidth, mHeight, title, nullptr, nullptr);
+    mWindow = glfwCreateWindow(m_width, m_height, title, nullptr, nullptr);
 
     if (mWindow == nullptr) {
         std::cout << "Failed to load window\n";
@@ -63,7 +63,7 @@ void spry::Window::start()
 
 bool spry::Window::isPressed(int key)
 {
-    if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (glfwGetKey(mWindow, key) == GLFW_PRESS) {
         return true;
     }
     return false;

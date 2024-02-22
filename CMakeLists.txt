@@ -23,7 +23,8 @@ include_directories("math")
 add_library(math
     "math/Vec2.cpp"
     "math/Mat4.cpp"
-    "math/Mat4.cpp"
+    "math/Transforms.cpp"
+    "math/Vec3.cpp"
 )
 
 # COMMON
@@ -40,12 +41,13 @@ add_library(renderer
     "renderer/Shader.cpp"
     "renderer/Cuboid.cpp"
     "renderer/Tetrahedron.cpp"
+    "renderer/BasicMesh.cpp"
     "renderer/glad.c"
+    "renderer/Camera.cpp"
 )
 target_link_libraries(renderer
     glfw
 )
-
 
 include_directories("include")
 add_executable(spryengine
