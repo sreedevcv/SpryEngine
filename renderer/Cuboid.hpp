@@ -10,7 +10,7 @@ namespace spry {
 class Cuboid {
 private:
     GLuint VAO, VBO, EBO;
-    spry::Shader& mShader;
+    spry::Shader& m_shader;
 
     void initBuffers();
 

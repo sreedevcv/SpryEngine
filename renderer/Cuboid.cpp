@@ -1,10 +1,10 @@
 #include "Cuboid.hpp"
 
 spry::Cuboid::Cuboid(spry::Shader& shader)
-    : mShader(shader)
+    : m_shader(shader)
 {
     initBuffers();
-    mShader.compile();
+    m_shader.compile();
     check_for_opengl_error();
 }
 
@@ -69,7 +69,7 @@ spry::Cuboid::~Cuboid()
 
 void spry::Cuboid::draw()
 {
-    mShader.use();
+    m_shader.use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

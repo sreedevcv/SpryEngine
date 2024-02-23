@@ -10,11 +10,11 @@ namespace spry {
 class Tetrahedron {
 private:
     unsigned int VAO, VBO, EBO;
-
+    
     void initBuffers();
 
 public:
-    spry::Shader& mShader;
+    spry::Shader& m_shader;
 
     Tetrahedron(Shader& shader);
     ~Tetrahedron();

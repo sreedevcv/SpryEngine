@@ -20,7 +20,6 @@ public:
     Vec3<float> m_front = Vec3(0.0f, 0.0f, -1.0f);
     Vec3<float> m_up = Vec3(0.0f, 1.0f, 0.0f);
     Vec3<float> m_right = Vec3(0.0f, 0.0f, 0.0f);
-    Mat4<float> projection = perspectiveProjection(0.1f, 100.0f, m_width / m_height, spry::radians(45.0f));
     float m_yaw = -90.0f;
     float m_pitch = 0.0f;
 
@@ -33,6 +32,7 @@ public:
     ~Camera() = default;
 
     spry::Mat4<float> get_view_matrix();
+    spry::Mat4<float> get_projection_matrix();
 
     enum class movement {
         FORWARD,
@@ -45,7 +45,7 @@ public:
         float first_mouse = true;
         float last_x;
         float last_y;
-        bool captured = false;
+        // bool captured = false;
     } mouse_data;
 
     void process_movement(movement m, float delta_time);

@@ -44,6 +44,7 @@ add_library(renderer
     "renderer/BasicMesh.cpp"
     "renderer/glad.c"
     "renderer/Camera.cpp"
+    "renderer/PlaneMesh.cpp"
 )
 target_link_libraries(renderer
     glfw
