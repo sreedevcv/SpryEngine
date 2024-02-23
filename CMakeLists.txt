@@ -52,7 +52,7 @@ target_link_libraries(renderer
 
 include_directories("include")
 add_executable(spryengine
-    "main.cpp"
+    "test/main.cpp"
 )
 
 target_link_libraries(
