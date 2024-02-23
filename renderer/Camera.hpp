@@ -16,7 +16,7 @@ private:
     void update_camera_vectors();
 
 public:
-    Vec3<float> m_position = Vec3(0.0f, 0.0f, 10.0f);
+    Vec3<float> m_position = Vec3(0.0f, 0.0f, 20.0f);
     Vec3<float> m_front = Vec3(0.0f, 0.0f, -1.0f);
     Vec3<float> m_up = Vec3(0.0f, 1.0f, 0.0f);
     Vec3<float> m_right = Vec3(0.0f, 0.0f, 0.0f);
@@ -25,7 +25,7 @@ public:
     float m_pitch = 0.0f;
 
     // Options
-    float m_speed = 1.0f;
+    float m_speed = 5.0f;
     float m_mouse_sensitivity = 0.1f;
     float m_zoom = 45.0f;
 

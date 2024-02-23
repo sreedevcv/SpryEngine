@@ -59,7 +59,7 @@ struct Vec3 {
         return *this;
     }
 
-    Vec3& operator*(const T& rhs)
+    Vec3& operator*=(const T& rhs)
     {
         x *= rhs;
         y *= rhs;
@@ -118,4 +118,15 @@ Vec3<T> operator-(const Vec3<T>& lhs, const Vec3<T>& rhs)
     result.z -= rhs.z;
     return result;
 }
+
+template <class T>
+Vec3<T> operator*(const Vec3<T>& lhs, const T rhs)
+{
+    Vec3<T> result = lhs;
+    result.x *= rhs;
+    result.y *= rhs;
+    result.z *= rhs;
+    return result;
+}
+
 }

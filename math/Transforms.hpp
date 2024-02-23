@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 #include <Vec2.hpp>
 #include <Vec3.hpp>
@@ -13,8 +14,12 @@ Vec2<T> norm(const Vec2<T>&& v)
 {
     Vec2<T> normVec = v;
     T root = static_cast<T>(std::sqrt(v.x * v.x + v.y * v.y));
-    // T root = static_cast<T>(std::sqrt(std::abs(v.x * v.x) + std::abs(v.y * v.y)));
-    
+
+    if (root < std::numeric_limits<T>::epsilon()) {
+        Vec3<T> nv = v * static_cast<T>(100000);
+        return norm(nv);
+    }
+
     normVec.x /= root;
     normVec.y /= root;
     return normVec;
@@ -25,13 +30,17 @@ Vec3<T> norm(const Vec3<T>& v)
 {
     Vec3<T> normVec = v;
     T root = static_cast<T>(std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
+
+    if (root < std::numeric_limits<T>::epsilon()) {
+        Vec3<T> nv = v * static_cast<T>(100000);
+        return norm(nv);
+    }
+        
     normVec.x /= root;
     normVec.y /= root;
     normVec.z /= root;
 
     bool a = std::isnan(normVec.x);
-
-
     return normVec;
 }
 

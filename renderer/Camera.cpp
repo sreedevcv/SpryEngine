@@ -10,7 +10,9 @@ spry::Camera::Camera(const int scr_width, const int scr_height)
 }
 
 spry::Mat4<float> spry::Camera::get_view_matrix() {
-    return spry::lookAt(m_position, (m_position + m_front), m_up);
+	auto temp = m_position + m_front;
+	auto temp2 = spry::lookAt(m_position, (temp), m_up);
+    return temp2;
 }
 
 void spry::Camera::update_camera_vectors() {

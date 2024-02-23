@@ -41,32 +41,28 @@ protected:
 
     void processInput(float deltaTime)
     {
-        const auto printMat = [](const spry::Mat4<float>& m) {
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                std::cout << m.values[i * 4 + j] << " ";
-            }
-            std::cout << "\n";
-        }
-        std::cout << "\n";
-    };
         if (isPressed(GLFW_KEY_ESCAPE)) {
             closeWindow();
         }
-
         if (isPressed(GLFW_KEY_W)) {
             m_camera.process_movement(spry::Camera::movement::FORWARD, deltaTime);
-std::cout << m_camera.m_position.x << " " << m_camera.m_position.y << " " << m_camera.m_position.z << "\n";
+            std::cout << m_camera.m_position.x << " " << m_camera.m_position.y << " " << m_camera.m_position.z << "\n";
             printMat(m_camera.get_view_matrix());
         }
         if (isPressed(GLFW_KEY_S)) {
             m_camera.process_movement(spry::Camera::movement::BACKWARD, deltaTime);
+            std::cout << m_camera.m_position.x << " " << m_camera.m_position.y << " " << m_camera.m_position.z << "\n";
+            printMat(m_camera.get_view_matrix());
         }
         if (isPressed(GLFW_KEY_A)) {
             m_camera.process_movement(spry::Camera::movement::LEFT, deltaTime);
+            std::cout << m_camera.m_position.x << " " << m_camera.m_position.y << " " << m_camera.m_position.z << "\n";
+            printMat(m_camera.get_view_matrix());
         }
         if (isPressed(GLFW_KEY_D)) {
             m_camera.process_movement(spry::Camera::movement::RIGHT, deltaTime);
+            std::cout << m_camera.m_position.x << " " << m_camera.m_position.y << " " << m_camera.m_position.z << "\n";
+            printMat(m_camera.get_view_matrix());
         }
     }
 
@@ -79,17 +75,24 @@ public:
         , cube(mShader)
         , m_camera(width, height)
     {
-        glClearColor(0.2f, 0.1f, 0.23f, 1.0f);
+        glClearColor(0.8f, 0.9f, 0.85f, 1.0f);
         mShader.compile();
     }
 };
 
 int main(int argc, char** argv)
 {
-    
 
     MyWindow w(600, 400);
     w.start();
+
+    // spry::Vec3 a = spry::Vec3(1.0f, 0.0f, 0.0f);
+    // spry::Vec3 b = spry::Vec3(0.0f, 1.0f, 0.0f);
+    // auto c = a + b;
+
+    // printVec(a);
+    // printVec(b);
+    // printVec(a + b);
 
     return 0;
 }
