@@ -4,10 +4,20 @@
 #include <vector>
 #include <span>
 
+spry::PlaneMesh::PlaneMesh()
+    : m_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
+{
+}
+
 spry::PlaneMesh::PlaneMesh(float length, float breadth, int length_segments, int breadth_segments)
     : m_length(length)
     , m_breadth(breadth)
-    , m_shader("./", "./")
+    , m_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
+{
+    load(length, breadth, length_segments, breadth_segments);
+}
+
+void spry::PlaneMesh::load(float length, float breadth, int length_segments, int breadth_segments)
 {
     std::vector<float> vertices(length * breadth * 3);
     float length_step = length / length_segments;
@@ -30,7 +40,7 @@ spry::PlaneMesh::PlaneMesh(float length, float breadth, int length_segments, int
 
     for (int i = 0; i < length_segments; i++) {
         for (int j = 0; j < breadth_segments; j++) {
-            int v0 = i * (breadth_segments + 1) + j;    
+            int v0 = i * (breadth_segments + 1) + j;
             int v1 = v0 + 1;
             int v2 = (i + 1) * (breadth_segments + 1) + j;
             int v3 = v2 + 1;
@@ -46,8 +56,8 @@ spry::PlaneMesh::PlaneMesh(float length, float breadth, int length_segments, int
         }
     }
 
-    int format[] = {3};
-    m_mesh.load_data(&m_shader, std::span<float>{vertices}, std::span<int>{indices}, std::span<int>{format});
+    int format[] = { 3 };
+    m_mesh.load_data(&m_shader, std::span<float> { vertices }, std::span<int> { indices }, std::span<int> { format });
 }
 
 void spry::PlaneMesh::draw()

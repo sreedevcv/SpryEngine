@@ -17,8 +17,10 @@ private:
     Shader m_shader;
 
 public:
+    PlaneMesh();
     PlaneMesh(float length, float breadth, int length_segments, int breadth_segments);
 
+    void load(float length, float breadth, int length_segments, int breadth_segments);
     void draw();
 };
 

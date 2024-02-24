@@ -12,6 +12,7 @@
 #include "Tetrahedron.hpp"
 #include "Camera.hpp"
 #include "BasicMesh.hpp"
+#include "PlaneMesh.hpp"
 
 #include "utils.hpp"
 
@@ -23,6 +24,7 @@ private:
     spry::Tetrahedron cube;
     spry::Camera m_camera;
     spry::BasicMesh mesh;
+    spry::PlaneMesh plane;
 
 protected:
     void updateFrame(float deltaTime)
@@ -32,11 +34,11 @@ protected:
         auto projection = m_camera.get_projection_matrix();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_shader.use();
-        m_shader.setUniformMatrix("model", model);
-        m_shader.setUniformMatrix("view", view);
-        m_shader.setUniformMatrix("projection", projection);
-        cube.draw();
+        // m_shader.use();
+        // m_shader.setUniformMatrix("model", model);
+        // m_shader.setUniformMatrix("view", view);
+        // m_shader.setUniformMatrix("projection", projection);
+        // cube.draw();
 
         // mesh.draw();
 
@@ -94,7 +96,7 @@ public:
         : Window(width, height, "Test")
         , m_width(width)
         , m_height(height)
-        , m_shader("C:/Users/SHARIHA3/source/repos/SpryEngine/basic.vert", "C:/Users/SHARIHA3/source/repos/SpryEngine/basic.frag")
+        , m_shader("../test/basic.vert", "../test/basic.frag")
         , cube(m_shader)
         , m_camera(width, height)
     {
