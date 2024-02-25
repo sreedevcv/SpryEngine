@@ -1,10 +1,8 @@
 #include "Cuboid.hpp"
 
-spry::Cuboid::Cuboid(spry::Shader& shader)
-    : m_shader(shader)
+spry::Cuboid::Cuboid()
 {
     initBuffers();
-    m_shader.compile();
     check_for_opengl_error();
 }
 
@@ -12,15 +10,15 @@ void spry::Cuboid::initBuffers()
 {
     constexpr float vertices[] = {
         // positions        // colours
-        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // front top left
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // front top right
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // front bottom left
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // front bottom right
+        -0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // front top left
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // front top right
+        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // front bottom left
+        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // front bottom right
 
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // back top left
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // back top right
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // back bottom left
-        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.1f, // back bottom right
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // back top left
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // back top right
+        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // back bottom left
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, // back bottom right
     };
 
     const unsigned int indices[] = {
@@ -69,7 +67,6 @@ spry::Cuboid::~Cuboid()
 
 void spry::Cuboid::draw()
 {
-    m_shader.use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

@@ -16,14 +16,16 @@ class MyWindow : public spry::Window {
 private:
     int m_width = 600;
     int m_height = 400;
+
     spry::Shader m_vetex_and_color_shader;
     spry::Shader m_vetex_shader;
-    spry::Tetrahedron cube;
     spry::Camera m_camera;
+    spry::Tetrahedron tetra;
+    spry::Cuboid cube;
     spry::PlaneMesh plane;
 
 protected:
-    void updateFrame(float deltaTime)
+    void update_frame(float deltaTime)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -35,6 +37,8 @@ protected:
         m_vetex_and_color_shader.set_uniform_matrix("model", cube_model);
         m_vetex_and_color_shader.set_uniform_matrix("view", view);
         m_vetex_and_color_shader.set_uniform_matrix("projection", projection);
+
+        // tetra.draw();
         cube.draw();
 
         auto plane_model = glm::mat4(1.0f);
@@ -46,14 +50,14 @@ protected:
         m_vetex_shader.set_uniform_matrix("model", plane_model);
         m_vetex_shader.set_uniform_matrix("view", view);
         m_vetex_shader.set_uniform_matrix("projection", projection);
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        plane.draw();
+        draw_wireframe(true);
+        // plane.draw();
         // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         check_for_opengl_error();
     }
 
-    void processInput(float deltaTime)
+    void process_input(float deltaTime)
     {
         if (is_pressed(GLFW_KEY_ESCAPE)) {
             closeWindow();
@@ -105,15 +109,15 @@ public:
         , m_height(height)
         , m_vetex_and_color_shader("../test/basic.vert", "../test/basic.frag")
         , m_vetex_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
-        , m_camera(width, height)
     {
-        glClearColor(0.8f, 0.9f, 0.85f, 1.0f);
-        capture_mouse();
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        capture_mouse(true);
 
+        m_camera.set_screen_size(width, height);
         m_vetex_and_color_shader.compile();
         m_vetex_shader.compile();
         plane.load(10.0f, 10.0f, 3, 3);
-        m_camera.m_position = glm::vec3(0.0f, 5.0f, 10.0f);
+        // m_camera.m_position = glm::vec3(0.0f, 5.0f, 10.0f);
 
         m_camera.mouse_data.first_mouse = true;
     }
