@@ -27,37 +27,28 @@ protected:
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        auto glm_model = glm::mat4(1.0f);
-        auto glm_view = m_camera.get_view_matrix();
-        auto glm_projection = m_camera.get_projection_matrix();
+        auto view = m_camera.get_view_matrix();
+        auto projection = m_camera.get_projection_matrix();
 
+        auto cube_model = glm::mat4(1.0f);
         m_vetex_and_color_shader.use();
-        m_vetex_and_color_shader.set_uniform_matrix("model", glm_model);
-        m_vetex_and_color_shader.set_uniform_matrix("view", glm_view);
-        m_vetex_and_color_shader.set_uniform_matrix("projection", glm_projection);
+        m_vetex_and_color_shader.set_uniform_matrix("model", cube_model);
+        m_vetex_and_color_shader.set_uniform_matrix("view", view);
+        m_vetex_and_color_shader.set_uniform_matrix("projection", projection);
         cube.draw();
 
+        auto plane_model = glm::mat4(1.0f);
+        // float angle = get_global_time() * 10.0f;
+        // std::cout << glm::radians(angle) << "\n";
+        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, 0.0f, -5.0f));
+        plane_model = glm::rotate(plane_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         m_vetex_shader.use();
-        m_vetex_shader.set_uniform_matrix("model", glm_model);
-        m_vetex_shader.set_uniform_matrix("view", glm_view);
-        m_vetex_shader.set_uniform_matrix("projection", glm_projection);
-        // plane.draw();
-
-        // const auto prt = [](glm::mat4& m) {
-        //     for (int i = 0; i < 4; i++) {
-        //         for (int j = 0; j < 4; j++) {
-        //             std::cout << m[i][j] << " ";
-        //         }
-        //         std::cout << "\n";
-        //     }
-        //     std::cout << "-------\n";
-        // };
-
-        // printMat(view);
-        // prt(glm_view);
-
-        // printMat(projection);
-        // prt(glm_projection);
+        m_vetex_shader.set_uniform_matrix("model", plane_model);
+        m_vetex_shader.set_uniform_matrix("view", view);
+        m_vetex_shader.set_uniform_matrix("projection", projection);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        plane.draw();
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         check_for_opengl_error();
     }
@@ -99,6 +90,7 @@ protected:
         m_camera.mouse_data.last_y = y_pos;
 
         m_camera.process_mouse_movement(x_offset, y_offset, true);
+        // std::cout << m_camera.m_up.x << " " << m_camera.m_up.y << " " << m_camera.m_up.z << "\n";
     }
 
     void on_mouse_scroll(double x_offset, double y_offset)
@@ -120,8 +112,8 @@ public:
 
         m_vetex_and_color_shader.compile();
         m_vetex_shader.compile();
-        plane.load(10.0f, 10.0f, 4, 4);
-        // m_camera.m_position = spry::Vec3(0.0f, 10.0f, 10.0f);
+        plane.load(10.0f, 10.0f, 3, 3);
+        m_camera.m_position = glm::vec3(0.0f, 5.0f, 10.0f);
 
         m_camera.mouse_data.first_mouse = true;
     }

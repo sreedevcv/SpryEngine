@@ -16,7 +16,7 @@ glm::mat4 spry::Camera::get_view_matrix()
 
 glm::mat4 spry::Camera::get_projection_matrix()
 {
-    return glm::perspective(glm::radians(m_zoom), (float)(m_width / m_height), 0.1f, 100.0f);
+    return glm::perspective(glm::radians(m_zoom), (float)(m_width / m_height), 0.1f, 1000.0f);
 }
 
 void spry::Camera::update_camera_vectors()
@@ -55,18 +55,12 @@ void spry::Camera::process_movement(movement m, float delta_time)
 
 void spry::Camera::process_mouse_movement(float x_offset, float y_offset, bool constrain_pitch)
 {
-    // std::cout << x_offset << " " << y_offset << "|\n";
 
     x_offset *= m_mouse_sensitivity;
     y_offset *= m_mouse_sensitivity;
-    // std::cout << m_yaw << " " << m_pitch << "\n";
 
     m_yaw += x_offset;
     m_pitch += y_offset;
-
-    // printVec(m_front);
-    std::cout << m_yaw << " " << m_pitch << "\n";
-    // std::cout << x_offset << " " << y_offset << "|\n";
 
     if (constrain_pitch) {
         if (m_pitch > 89.0f) {

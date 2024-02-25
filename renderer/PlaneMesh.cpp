@@ -36,8 +36,8 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
     std::vector<int> indices;
     int count = 0;
 
-    for (int i = 0; i <= length_segments; i++) {
-        for (int j = 0; j <= breadth_segments; j++) {
+    for (int i = 0; i < length_segments; i++) {
+        for (int j = 0; j < breadth_segments; j++) {
             int v0 = i * (breadth_segments + 1) + j;
             int v1 = v0 + 1;
             int v2 = (i + 1) * (breadth_segments + 1) + j;
