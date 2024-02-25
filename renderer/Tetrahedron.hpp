@@ -14,9 +14,7 @@ private:
     void initBuffers();
 
 public:
-    spry::Shader& m_shader;
-
-    Tetrahedron(Shader& shader);
+    Tetrahedron();
     ~Tetrahedron();
 
     void draw();

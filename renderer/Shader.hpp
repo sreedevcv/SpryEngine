@@ -10,6 +10,9 @@
 #include "Mat4.hpp"
 #include "utils.hpp"
 
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace spry {
 
 class Shader {
@@ -25,7 +28,9 @@ public:
 
     void compile();
     void use();
-    void setUniformMatrix(const char* name, spry::Mat4<float>& value);
+    void set_uniform_matrix(const char* name, spry::Mat4<float>& value);
     void setUniformFloat(const char* name, float value);
+
+    void set_uniform_matrix(const char *name, glm::mat4& value);
 };
 }

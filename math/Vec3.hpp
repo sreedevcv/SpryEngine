@@ -21,44 +21,6 @@ struct Vec3 {
     {
     }
 
-    // Copy Constructor
-    Vec3(const Vec3& other)
-        : x(other.x)
-        , y(other.y)
-        , z(other.z)
-    {
-    }
-
-    // Move Constructor
-    Vec3(Vec3&& other) noexcept
-        : x(std::move(other.x))
-        , y(std::move(other.y))
-        , z(std::move(other.z))
-    {
-    }
-
-    // Copy Assignment Operator
-    Vec3& operator=(const Vec3& other)
-    {
-        if (this != &other) {
-            x = other.x;
-            y = other.y;
-            z = other.z;
-        }
-        return *this;
-    }
-
-    // Move Assignment Operator
-    Vec3& operator=(Vec3&& other) noexcept
-    {
-        if (this != &other) {
-            x = std::move(other.x);
-            y = std::move(other.y);
-            z = std::move(other.z);
-        }
-        return *this;
-    }
-
     Vec3& operator*=(const T& rhs)
     {
         x *= rhs;
@@ -87,15 +49,16 @@ struct Vec3 {
 template <class T>
 T dot(const Vec3<T>& lhs, const Vec3<T>& rhs)
 {
-    return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+    return (lhs.x * rhs.x) + (lhs.y * rhs.y) + (lhs.z * rhs.z);
 }
 
 template <class T>
 Vec3<T> cross(const Vec3<T>& lhs, const Vec3<T>& rhs)
 {
-    Vec3<T> result(lhs.y * rhs.z - lhs.z * rhs.y,
+    Vec3<T> result(
+        lhs.y * rhs.z - lhs.z * rhs.y,
         lhs.z * rhs.x - lhs.x * rhs.z,
-        lhs.x * rhs.y - lhs.y * rhs.z);
+        lhs.x * rhs.y - lhs.y * rhs.x);
     return result;
 }
 

@@ -23,12 +23,13 @@ public:
     Window(int width, int height, const char* title);
     virtual ~Window();
 
-    void start();
-    bool isPressed(int key);
+    bool is_pressed(int key);
     void capture_mouse();
     void release_mouse();
+    double get_global_time();
 
 
+    void start();
     void closeWindow();
 };
 

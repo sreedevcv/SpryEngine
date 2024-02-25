@@ -5,11 +5,10 @@ spry::BasicMesh::BasicMesh()
 {
 }
 
-spry::BasicMesh::BasicMesh(Shader* shader, std::span<float> vertices, std::span<int> indices, std::span<int> format)
+spry::BasicMesh::BasicMesh(std::span<float> vertices, std::span<int> indices, std::span<int> format)
     : m_vertex_count(indices.size())
-    , m_shader(shader)
 {
-    load_data(shader, vertices, indices, format);
+    load_data(vertices, indices, format);
     m_data_loaded = true;
 }
 
@@ -19,14 +18,13 @@ spry::BasicMesh::~BasicMesh()
     glDeleteBuffers(1, &EBO);
 }
 
-void spry::BasicMesh::load_data(Shader *shader, std::span<float> vertices, std::span<int> indices, std::span<int> format)
+void spry::BasicMesh::load_data(std::span<float> vertices, std::span<int> indices, std::span<int> format)
 {
     if (m_data_loaded) {
         return;
     }
 
     m_vertex_count = indices.size();
-    m_shader = shader;
     m_data_loaded = true;
 
     glGenVertexArrays(1, &VAO);
@@ -55,7 +53,6 @@ void spry::BasicMesh::load_data(Shader *shader, std::span<float> vertices, std::
 
 void spry::BasicMesh::draw()
 {
-    m_shader->use();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_vertex_count, GL_UNSIGNED_INT, 0);
 }

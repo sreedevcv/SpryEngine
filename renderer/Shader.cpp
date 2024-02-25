@@ -85,7 +85,7 @@ void spry::Shader::use()
     glUseProgram(ID);
 }
 
-void spry::Shader::setUniformMatrix(const char* name, spry::Mat4<float>& value)
+void spry::Shader::set_uniform_matrix(const char* name, spry::Mat4<float>& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, value.getData());
@@ -95,4 +95,9 @@ void spry::Shader::setUniformFloat(const char* name, float value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform1f(loc, value);
+}
+
+void spry::Shader::set_uniform_matrix(const char *name, glm::mat4& value) {
+    int loc = glGetUniformLocation(ID, name);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }

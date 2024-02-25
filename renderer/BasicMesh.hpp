@@ -11,7 +11,6 @@ namespace spry {
 class BasicMesh {
 private:
     int m_vertex_count;
-    Shader *m_shader;
     bool m_data_loaded = false;
 
     unsigned int VAO;
@@ -20,10 +19,10 @@ private:
 
 public:
     BasicMesh();
-    BasicMesh(Shader* shader, std::span<float> vertices, std::span<int> indices, std::span<int> format);
+    BasicMesh(std::span<float> vertices, std::span<int> indices, std::span<int> format);
     ~BasicMesh();
 
-    void load_data(Shader* shader, std::span<float> vertices, std::span<int> indices, std::span<int> format);
+    void load_data(std::span<float> vertices, std::span<int> indices, std::span<int> format);
     void draw();
 };
 

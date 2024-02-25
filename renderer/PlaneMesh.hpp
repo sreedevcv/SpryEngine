@@ -14,8 +14,6 @@ private:
     int m_length;
     int m_breadth;
 
-    Shader m_shader;
-
 public:
     PlaneMesh();
     PlaneMesh(float length, float breadth, int length_segments, int breadth_segments);

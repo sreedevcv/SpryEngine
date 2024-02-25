@@ -26,12 +26,12 @@ spry::Window::Window(int width, int height, const char* title)
     glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
 
     static const auto mouse_move_callback = [](GLFWwindow *glfw_window, double x_pos_in, double y_pos_in) {
-        Window* window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+        auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
         window->on_mouse_move(x_pos_in, y_pos_in);
     };
 
     static const auto mouse_scroll_callback = [](GLFWwindow *glfw_window, double x_offset, double y_offset) {
-        Window* window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+        auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
         window->on_mouse_scroll(x_offset, y_offset);
     };
 
@@ -74,7 +74,7 @@ void spry::Window::start()
     }
 }
 
-bool spry::Window::isPressed(int key)
+bool spry::Window::is_pressed(int key)
 {
     if (glfwGetKey(m_window, key) == GLFW_PRESS) {
         return true;
@@ -90,6 +90,11 @@ void spry::Window::capture_mouse()
 void spry::Window::release_mouse()
 {
     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+double spry::Window::get_global_time()
+{
+    return glfwGetTime();
 }
 
 void spry::Window::closeWindow()
