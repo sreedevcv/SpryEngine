@@ -74,12 +74,21 @@ void spry::Window::start()
     }
 }
 
-bool spry::Window::is_pressed(int key)
+bool spry::Window::is_key_pressed(int key)
 {
     if (glfwGetKey(m_window, key) == GLFW_PRESS) {
         return true;
     }
     return false;
+}
+
+// Does not work
+bool spry::Window::is_key_released(int key)
+{
+    if (glfwGetKey(m_window, key) == GLFW_RELEASE) {
+        return false;
+    }
+    return true;
 }
 
 void spry::Window::capture_mouse(bool capture)

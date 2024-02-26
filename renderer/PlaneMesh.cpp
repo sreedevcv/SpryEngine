@@ -1,8 +1,9 @@
 #include "PlaneMesh.hpp"
 
-#include "Vec3.hpp"
 #include <vector>
 #include <span>
+
+#include <glm/vec3.hpp>
 
 spry::PlaneMesh::PlaneMesh()
 {
@@ -23,7 +24,7 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
 
     for (int i = 0; i <= length_segments; i++) {
         for (int j = 0; j <= breadth_segments; j++) {
-            Vec3<float> vertex;
+            glm::vec3 vertex;
             vertex.x = i * length_step;
             vertex.y = j * breadth_step;
             vertex.z = 0.0f;

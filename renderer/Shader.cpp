@@ -52,7 +52,7 @@ void spry::Shader::compile()
                 std::cout << "[ERROR]::LINK::";
             } else {
                 glGetShaderInfoLog(shader, 1024, nullptr, log);
-                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::";
+                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::" << mVertShaderSource << "::";
             }
             std::cout << log << std::endl;
         }

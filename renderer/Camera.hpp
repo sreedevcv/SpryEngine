@@ -13,6 +13,7 @@ class Camera {
 private:
     int m_width;
     int m_height;
+    float aspect_ratio;
 
     void update_camera_vectors();
 
@@ -20,7 +21,7 @@ public:
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 20.0f);
     glm::vec3 m_front = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 m_right = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 m_right = glm::vec3(1.0f, 0.0f, 0.0f);
 
     float m_yaw = -90.0f;
     float m_pitch = 0.0f;

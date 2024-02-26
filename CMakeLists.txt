@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.27.0)
 project(spryengine VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 20)
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 include(FetchContent)
 
@@ -25,24 +25,24 @@ FetchContent_Declare(
     GIT_TAG 33b0eb9fa336ffd8551024b1d2690e418014553b
 )
 set(GLM_BUILD_TESTS OFF)
-set(BUILD_SHARED_LIBS ON)
+# set(BUILD_SHARED_LIBS ON)
 FetchContent_MakeAvailable(glm)
 
 # MATH
-include_directories("math")
-add_library(math
-    "math/Vec2.cpp"
-    "math/Mat4.cpp"
-    "math/Transforms.cpp"
-    "math/Vec3.cpp"
-)
+# include_directories("math")
+# add_library(math
+#     "math/Vec2.cpp"
+#     "math/Mat4.cpp"
+#     "math/Transforms.cpp"
+#     "math/Vec3.cpp"
+# )
 
 # COMMON
 include_directories("common")
-add_library(common 
-    "common/Entity.cpp"
-    "common/Rect.cpp"
-)
+# add_library(common 
+#     "common/Entity.cpp"
+#     "common/Rect.cpp"
+# )
 
 # RENDERER
 include_directories("renderer")
@@ -55,20 +55,24 @@ add_library(renderer
     "renderer/glad.c"
     "renderer/Camera.cpp"
     "renderer/PlaneMesh.cpp"
+
+    "common/Entity.cpp"
+    "common/Rect.cpp"
+    "common/Logger.cpp"
 )
 target_link_libraries(renderer
     glfw
-   glm::glm
+    glm::glm
 )
 
 include_directories("include")
 add_executable(spryengine
-    "test/main.cpp"
+    # "test/main.cpp"
+    "test/test.cpp"
 )
 
 target_link_libraries(
    spryengine
    renderer
-   math
-   common
+#    common
 )

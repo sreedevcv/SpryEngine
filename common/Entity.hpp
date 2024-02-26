@@ -1,29 +1,20 @@
 #pragma once
 
-#include "Vec2.hpp"
+#include <glm/vec2.hpp>
 
 namespace spry {
-	template<typename T=float>
 	class Entity {
 	protected:
-		Vec2<T> mPosition;
+		glm::vec2 mPosition;
 
 	public:
-		Entity(Vec2<T> position)
-			: mPosition(position)
-		{}
+		Entity(glm::vec2 position);
 
 		virtual ~Entity() = default;
 
-		void setPosition(Vec2<T>& position)
-		{
-			mPosition = position;
-		}
+		void setPosition(glm::vec2& position);
 
-		Vec2<T>& getPosition()
-		{
-			return mPosition;
-		}
+		glm::vec2& getPosition();
 
 		virtual void draw() = 0;
 		virtual void update(float deltaTime) = 0;

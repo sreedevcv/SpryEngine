@@ -23,7 +23,8 @@ public:
     Window(int width, int height, const char* title);
     virtual ~Window();
 
-    bool is_pressed(int key);
+    bool is_key_pressed(int key);
+    bool is_key_released(int key);
     double get_global_time();
     void capture_mouse(bool capture);
     void draw_wireframe(bool value);

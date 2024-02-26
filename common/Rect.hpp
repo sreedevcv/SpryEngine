@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Vec2.hpp"
+#include <glm/vec2.hpp>
 
 namespace spry
 {
 	class Rect {
 	public:
-		Vec2<float> mPosition = { 0.0f, 0.0f };
-		Vec2<float> mSize = { 0.0f, 0.0f };
+		glm::vec2 mPosition = { 0.0f, 0.0f };
+		glm::vec2 mSize = { 0.0f, 0.0f };
 
-		Rect(Vec2<float>& position, Vec2<float>& size);
+		Rect(glm::vec2& position, glm::vec2& size);
 		~Rect();
 	};
 
