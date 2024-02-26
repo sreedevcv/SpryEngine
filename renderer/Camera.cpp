@@ -36,14 +36,6 @@ void spry::Camera::update_camera_vectors()
     updated_front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 
     m_front = glm::normalize(updated_front);
-    // m_right = glm::normalize(glm::cross(m_up, m_front));
-    // m_up = glm::normalize(glm::cross(m_front, m_right));
-
-    // printVec(m_front);
-    // printVec(m_right);
-    // printVec(m_up);
-    // std::cout << "\n";
-    // std::cout << m_yaw << " | " << m_pitch << " | " << glm::radians(m_yaw) << " | " << glm::radians(m_pitch) << "\n";
 }
 
 void spry::Camera::process_movement(movement m, float delta_time)
@@ -79,10 +71,8 @@ void spry::Camera::process_mouse_movement(float x_offset, float y_offset, bool c
     m_yaw += x_offset;
     m_pitch += y_offset;
 
-    // m_yaw = std::fmod(m_yaw + x_offset, 360.0f);
+    m_yaw = std::fmod(m_yaw + x_offset, 360.0f);
     // m_yaw = glm::mod( m_yaw + x_offset, 360.0f );
-
-    // std::cout << m_yaw << " " << m_pitch << "\n";
 
     if (constrain_pitch) {
         m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);

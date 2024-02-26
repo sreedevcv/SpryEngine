@@ -1,8 +1,5 @@
 #include <iostream>
 
-#include <chrono>
-#include <thread>
-
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -28,29 +25,30 @@ private:
     spry::PlaneMesh plane;
 
 protected:
-    void update_frame(float deltaTime)
+    void update_frame(float delta_time) override
     {
+        process_input(delta_time);
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        const float radius = 1.0f;
-        // float camX = sin(get_global_time()) * radius;
-        // float camZ = cos(get_global_time()) * radius;
-        // auto view = glm::lookAt(glm::vec3(camX, camX, camZ), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        // m_camera.m_yaw += camX * 0.01f;
-        // m_camera.m_pitch += camX * 0.01f;
-        // m_camera.update_camera_vectors();
+        float angle = get_global_time();
+
         auto view = m_camera.get_view_matrix();
         auto projection = m_camera.get_projection_matrix();
 
         auto cube_model = glm::mat4(1.0f);
+        cube_model = glm::rotate(cube_model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        cube_model = glm::translate(cube_model, glm::vec3(0.0f, sin(angle * 0.5f) * 0.5f, 0.0f));
+        cube_model = glm::scale(cube_model, glm::vec3(1.5f, 1.5f, 1.5f));
+
         m_vetex_and_color_shader.use();
         m_vetex_and_color_shader.set_uniform_matrix("model", cube_model);
         m_vetex_and_color_shader.set_uniform_matrix("view", view);
         m_vetex_and_color_shader.set_uniform_matrix("projection", projection);
-        cube.draw();
+        tetra.draw();
 
         auto plane_model = glm::mat4(1.0f);
-        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, 0.0f, -5.0f));
+        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, -1.0f, -5.0f));
         plane_model = glm::rotate(plane_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         m_vetex_shader.use();
@@ -60,30 +58,28 @@ protected:
         plane.draw();
 
         check_for_opengl_error();
-
-        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    void process_input(float deltaTime)
+    void process_input(float delta_time)
     {
         if (is_key_pressed(GLFW_KEY_ESCAPE)) {
-            closeWindow();
+            close_window();
         }
         if (is_key_pressed(GLFW_KEY_W)) {
-            m_camera.process_movement(spry::Camera::movement::FORWARD, deltaTime);
+            m_camera.process_movement(spry::Camera::movement::FORWARD, delta_time);
         }
         if (is_key_pressed(GLFW_KEY_S)) {
-            m_camera.process_movement(spry::Camera::movement::BACKWARD, deltaTime);
+            m_camera.process_movement(spry::Camera::movement::BACKWARD, delta_time);
         }
         if (is_key_pressed(GLFW_KEY_A)) {
-            m_camera.process_movement(spry::Camera::movement::RIGHT, deltaTime);
+            m_camera.process_movement(spry::Camera::movement::LEFT, delta_time);
         }
         if (is_key_pressed(GLFW_KEY_D)) {
-            m_camera.process_movement(spry::Camera::movement::LEFT, deltaTime);
+            m_camera.process_movement(spry::Camera::movement::RIGHT, delta_time);
         }
     }
 
-    void on_mouse_move(double x_pos_in, double y_pos_in)
+    void on_mouse_move(double x_pos_in, double y_pos_in) override
     {
         float x_pos = static_cast<float>(x_pos_in);
         float y_pos = static_cast<float>(y_pos_in);
@@ -94,9 +90,6 @@ protected:
             m_camera.mouse_data.first_mouse = false;
         }
 
-        // std::cout << m_camera.m_up.x << " " << m_camera.m_up.y << " " << m_camera.m_up.z << "\n";
-        // std::cout << x_pos_in << " " << y_pos_in << "\n";
-
         float x_offset = x_pos - m_camera.mouse_data.last_x;
         float y_offset = m_camera.mouse_data.last_y - y_pos;
 
@@ -106,9 +99,14 @@ protected:
         m_camera.process_mouse_movement(x_offset, y_offset, true);
     }
 
-    void on_mouse_scroll(double x_offset, double y_offset)
+    void on_mouse_scroll(double x_offset, double y_offset) override
     {
         m_camera.process_mouse_scroll(static_cast<float>(y_offset));
+    }
+
+    void on_screen_size_change(int width, int height) override
+    {
+        m_camera.set_screen_size(width, height);
     }
 
 public:
@@ -116,18 +114,18 @@ public:
         : Window(width, height, "Test")
         , m_width(width)
         , m_height(height)
-        , m_vetex_and_color_shader("../test/basic.vert", "../test/basic.frag")
-        , m_vetex_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
+        , m_vetex_and_color_shader("./test/basic.vert", "./test/basic.frag")
+        , m_vetex_shader("./test/planeMesh.vert", "./test/planeMesh.frag")
     {
-        capture_mouse(true);
-        draw_wireframe(true);
+        set_mouse_capture(true);
+        // set_wireframe_mode(true);
 
         plane.load(10.0f, 10.0f, 3, 3);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
-        // m_camera.m_position = glm::vec3(0.0f, 5.0f, 10.0f);
+        m_camera.m_position = glm::vec3(0.0f, 1.0f, 3.0f);
         m_vetex_and_color_shader.compile();
         m_vetex_shader.compile();
     }
@@ -139,3 +137,9 @@ int main(int argc, char** argv)
     w.start();
     return 0;
 }
+
+/* ray tracer
+ * lines
+ * points
+ * spheres
+ */

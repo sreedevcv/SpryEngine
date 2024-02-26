@@ -68,7 +68,7 @@ protected:
     void process_input(float deltaTime)
     {
         if (is_key_pressed(GLFW_KEY_ESCAPE)) {
-            closeWindow();
+            close_window();
         }
         if (is_key_pressed(GLFW_KEY_W)) {
             m_camera.process_movement(spry::Camera::movement::FORWARD, deltaTime);
@@ -120,8 +120,8 @@ public:
         , m_vetex_and_color_shader("../test/basic.vert", "../test/basic.frag")
         , m_vetex_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
     {
-        capture_mouse(true);
-        draw_wireframe(true);
+        set_mouse_capture(true);
+        set_wireframe_mode(true);
 
         plane.load(10.0f, 10.0f, 3, 3);
 

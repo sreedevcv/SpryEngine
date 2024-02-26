@@ -17,13 +17,8 @@ spry::Window::Window(int width, int height, const char* title)
         std::exit(-1);
     }
 
-    const auto framebufferSizeCallback = [](GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
-    };
-
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, this);
-    glfwSetFramebufferSizeCallback(m_window, framebufferSizeCallback);
 
     static const auto mouse_move_callback = [](GLFWwindow* glfw_window, double x_pos_in, double y_pos_in) {
         auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
@@ -35,8 +30,15 @@ spry::Window::Window(int width, int height, const char* title)
         window->on_mouse_scroll(x_offset, y_offset);
     };
 
+    const auto framebuffer_size_callback = [](GLFWwindow* glfw_window, int width, int height) {
+        glViewport(0, 0, width, height);
+        auto window = static_cast<Window*>(glfwGetWindowUserPointer(glfw_window));
+        window->on_screen_size_change(width, height);
+    };
+
     glfwSetCursorPosCallback(m_window, mouse_move_callback);
     glfwSetScrollCallback(m_window, mouse_scroll_callback);
+    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -66,7 +68,6 @@ void spry::Window::start()
         float deltaTime = static_cast<float>(currTime - prevTime);
         prevTime = currTime;
 
-        process_input(deltaTime);
         update_frame(deltaTime);
 
         glfwSwapBuffers(m_window);
@@ -91,7 +92,7 @@ bool spry::Window::is_key_released(int key)
     return true;
 }
 
-void spry::Window::capture_mouse(bool capture)
+void spry::Window::set_mouse_capture(bool capture)
 {
     if (capture) {
         glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -105,7 +106,7 @@ double spry::Window::get_global_time()
     return glfwGetTime();
 }
 
-void spry::Window::draw_wireframe(bool value)
+void spry::Window::set_wireframe_mode(bool value)
 {
     if (value) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -114,7 +115,19 @@ void spry::Window::draw_wireframe(bool value)
     }
 }
 
-void spry::Window::closeWindow()
+void spry::Window::close_window()
 {
     glfwSetWindowShouldClose(m_window, true);
+}
+
+void spry::Window::on_mouse_move(double x_pos_in, double y_pos_in)
+{
+}
+
+void spry::Window::on_mouse_scroll(double x_offset, double y_offset)
+{
+}
+
+void spry::Window::on_screen_size_change(int width, int height)
+{
 }
