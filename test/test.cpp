@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -11,6 +12,7 @@
 #include "PlaneMesh.hpp"
 #include "Sphere.hpp"
 #include "Line.hpp"
+#include "Point.hpp"
 
 #include "utils.hpp"
 
@@ -29,6 +31,7 @@ private:
     spry::Line x_axis;
     spry::Line y_axis;
     spry::Line z_axis;
+    spry::Point point;
 
 protected:
     void update_frame(float delta_time) override
@@ -78,6 +81,9 @@ protected:
         y_axis.draw();
         m_vetex_shader.set_uniform_vec4("color", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
         z_axis.draw();
+
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        point.draw();
 
         check_for_opengl_error();   
     }
@@ -152,6 +158,17 @@ public:
         m_vetex_and_color_shader.compile();
         m_vetex_shader.compile();
 
+        std::vector<glm::vec3> point_vec = {
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f, 1.0f, 1.0f),
+            glm::vec3(-1.0f, -1.0f, -1.0f),
+            glm::vec3(1.0f, 3.0f, -4.0f),
+        };
+        point_vec.shrink_to_fit();
+        
+        point.load(std::span<glm::vec3>{point_vec});
+        point.set_point_size(10.0f);
+
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
         z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
@@ -159,15 +176,12 @@ public:
     }
 };
 
-int main(int argc, char** argv)
-{
-    MyWindow w(800, 600);
-    w.start();
-    return 0;
-}
+// int main(int argc, char** argv)
+// {
+//     MyWindow w(800, 600);
+//     w.start();
+//     return 0;
+// }
 
 /* ray tracer
- * lines
- * points
- * spheres
  */

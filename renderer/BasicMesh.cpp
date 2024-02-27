@@ -108,6 +108,6 @@ void spry::BasicMesh::draw(GLenum mode)
     if (index_array) {
         glDrawElements(mode, m_vertex_count, GL_UNSIGNED_INT, 0);
     } else {
-        glDrawArrays(mode, 0, 2);
+        glDrawArrays(mode, 0, m_vertex_count);
     }
 }

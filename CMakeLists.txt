@@ -66,6 +66,7 @@ add_library(renderer
     "renderer/PlaneMesh.cpp"
     "renderer/Sphere.cpp"
     "renderer/Line.cpp"
+    "renderer/Point.cpp"
 
     "common/Entity.cpp"
     "common/Rect.cpp"
@@ -80,6 +81,7 @@ include_directories("include")
 add_executable(spryengine
     # "test/main.cpp"
     "test/test.cpp"
+    "test/RubiksCube.cpp"
 )
 
 target_link_libraries(
