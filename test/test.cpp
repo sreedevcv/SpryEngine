@@ -41,9 +41,12 @@ protected:
         process_input(delta_time);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        float varying = glm::abs(glm::sin(get_global_time()));
+        // float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
+        // float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
+        // glm::vec3 light_pos = glm::vec3(x, 30.0f, z);
 
         auto model = glm::mat4(1.0f);
+        // model = glm::scale(model, glm::vec3(10.0f, 2.0f, 10.0f));
         auto view = m_camera.get_view_matrix();
         auto projection = m_camera.get_projection_matrix();
 
@@ -56,11 +59,14 @@ protected:
         m_light_shader.set_uniform_matrix("model", model);
         m_light_shader.set_uniform_matrix("view", view);
         m_light_shader.set_uniform_matrix("projection", projection);
-        m_light_shader.set_uniform_vec("light_pos", glm::vec3(0.0f, 40.f, 20.0f));
         m_light_shader.set_uniform_vec("light_color", glm::vec3(1.0f, 1.0f, 1.0f));
         m_light_shader.set_uniform_vec("object_color", glm::vec4(0.5, 0.7, 0.6, 1.0));
-        cube.draw();
-        
+        // m_light_shader.set_uniform_vec("light_pos", light_pos);
+        m_light_shader.set_uniform_vec("light_pos", glm::vec3(0.0f, 40.f, 20.0f));
+        m_light_shader.set_uniform_vec("view_pos", m_camera.m_position);
+        // cube.draw();
+        sphere.draw();
+
         check_for_opengl_error();
         // close_window();
     }
@@ -81,6 +87,12 @@ protected:
         }
         if (is_key_pressed(GLFW_KEY_D)) {
             m_camera.process_movement(spry::Camera::movement::RIGHT, delta_time);
+        }
+        if (is_key_pressed(GLFW_KEY_SPACE)) {
+            m_camera.process_movement(spry::Camera::movement::UP, delta_time);
+        }
+        if (is_key_pressed(GLFW_KEY_LEFT_SHIFT)) {
+            m_camera.process_movement(spry::Camera::movement::DOWN, delta_time);
         }
     }
 
@@ -173,6 +185,7 @@ protected:
         m_vetex_shader.set_uniform_vec("color", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
         z_axis.draw();
     }
+
 public:
     MyWindow(int width, int height)
         : Window(width, height, "Test")

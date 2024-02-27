@@ -36,9 +36,9 @@ void spry::Sphere::load(const float radius, const int sectors, const int stacks)
             float normal_y = y * length_inverse;
             float normal_z = z * length_inverse;
 
-            normals.push_back(normal_x);
-            normals.push_back(normal_y);
-            normals.push_back(normal_z);
+            vertices.push_back(normal_x);
+            vertices.push_back(normal_y);
+            vertices.push_back(normal_z);
 
             /*  Texture coordinates
                 float s = static_cast<float>(j) / sectors;
@@ -67,12 +67,11 @@ void spry::Sphere::load(const float radius, const int sectors, const int stacks)
     }
 
     vertices.shrink_to_fit();
-    normals.shrink_to_fit();
     indices.shrink_to_fit();
 
-    int format[] = {3};
+    int format[] = { 3, 3 };
 
-    m_mesh.load_data(std::span<float> {vertices}, std::span<int> {indices}, std::span<int> {format});
+    m_mesh.load_data(std::span<float> { vertices }, std::span<int> { indices }, std::span<int> { format });
 }
 
 void spry::Sphere::draw()

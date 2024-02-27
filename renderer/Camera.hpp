@@ -39,6 +39,8 @@ public:
         BACKWARD,
         LEFT,
         RIGHT,
+        UP,
+        DOWN,
     };
 
     struct mouse_data_struct {

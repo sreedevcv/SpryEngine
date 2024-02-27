@@ -57,13 +57,19 @@ void spry::Camera::process_movement(movement m, float delta_time)
         break;
 
     case movement::LEFT:
-        // m_position -= m_right * velocity;
         m_position += glm::normalize(glm::cross(m_up, m_front)) * velocity;
         break;
 
     case movement::RIGHT:
-        // m_position += m_right * velocity;
         m_position += glm::normalize(glm::cross(m_front, m_up)) * velocity;
+        break;
+
+    case movement::UP:
+        m_position.y += velocity;
+        break;
+
+    case movement::DOWN:
+        m_position.y -= velocity;
         break;
     }
 }
