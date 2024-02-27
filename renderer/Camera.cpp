@@ -28,6 +28,11 @@ void spry::Camera::set_screen_size(const int width, const int height)
     aspect_ratio = static_cast<float>(m_width) / static_cast<float>(m_height);
 }
 
+void spry::Camera::set_position(glm::vec3&& position)
+{
+    m_position = position;
+}
+
 void spry::Camera::update_camera_vectors()
 {
     glm::vec3 updated_front;

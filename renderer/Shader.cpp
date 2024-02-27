@@ -91,12 +91,19 @@ void spry::Shader::set_uniform_float(const char* name, float value)
     glUniform1f(loc, value);
 }
 
-void spry::Shader::set_uniform_matrix(const char *name, glm::mat4& value) {
+void spry::Shader::set_uniform_matrix(const char* name, glm::mat4& value)
+{
     int loc = glGetUniformLocation(ID, name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void spry::Shader::set_uniform_vec4(const char* name, glm::vec4&& value)
+void spry::Shader::set_uniform_vec(const char* name, glm::vec3&& value)
+{
+    int loc = glGetUniformLocation(ID, name);
+    glUniform3fv(loc, 1, glm::value_ptr(value));
+}
+
+void spry::Shader::set_uniform_vec(const char* name, glm::vec4&& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform4fv(loc, 1, glm::value_ptr(value));

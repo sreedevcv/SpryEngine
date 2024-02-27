@@ -56,6 +56,7 @@ public:
     void process_mouse_scroll(float y_offset);
     
     void set_screen_size(const int width, const int height);
+    void set_position(glm::vec3&& position);
 };
 
 }
