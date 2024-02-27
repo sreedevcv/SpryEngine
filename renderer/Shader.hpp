@@ -29,5 +29,6 @@ public:
     void use();
     void set_uniform_float(const char* name, float value);
     void set_uniform_matrix(const char *name, glm::mat4& value);
+    void set_uniform_vec4(const char *name, glm::vec4&& value);
 };
 }

@@ -8,8 +8,10 @@
 #include "Window.hpp"
 #include "Tetrahedron.hpp"
 #include "Camera.hpp"
-#include "BasicMesh.hpp"
 #include "PlaneMesh.hpp"
+#include "Sphere.hpp"
+#include "Line.hpp"
+
 #include "utils.hpp"
 
 class MyWindow : public spry::Window {
@@ -23,6 +25,10 @@ private:
     spry::Tetrahedron tetra;
     spry::Cuboid cube;
     spry::PlaneMesh plane;
+    spry::Sphere sphere;
+    spry::Line x_axis;
+    spry::Line y_axis;
+    spry::Line z_axis;
 
 protected:
     void update_frame(float delta_time) override
@@ -38,7 +44,7 @@ protected:
 
         auto cube_model = glm::mat4(1.0f);
         cube_model = glm::rotate(cube_model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        cube_model = glm::translate(cube_model, glm::vec3(0.0f, sin(angle * 0.5f) * 0.5f, 0.0f));
+        cube_model = glm::translate(cube_model, glm::vec3(0.0f, sin(angle * 0.5f), 0.0f));
         cube_model = glm::scale(cube_model, glm::vec3(1.5f, 1.5f, 1.5f));
 
         m_vetex_and_color_shader.use();
@@ -48,16 +54,32 @@ protected:
         tetra.draw();
 
         auto plane_model = glm::mat4(1.0f);
-        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, -1.0f, -5.0f));
+        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, -3.0f, -5.0f));
         plane_model = glm::rotate(plane_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         m_vetex_shader.use();
         m_vetex_shader.set_uniform_matrix("model", plane_model);
         m_vetex_shader.set_uniform_matrix("view", view);
         m_vetex_shader.set_uniform_matrix("projection", projection);
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(1.0f, 0.9f, 0.8f, 1.0f));
         plane.draw();
 
-        check_for_opengl_error();
+        auto sphere_model = glm::mat4(1.0f);
+        sphere_model = glm::translate(sphere_model, glm::vec3(3.0f, 1.0f, -5.0f));
+        m_vetex_shader.set_uniform_matrix("model", sphere_model);
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(0.8f, 1.0f, 0.9f, 1.0f));
+        sphere.draw();
+
+        auto line_model = glm::mat4(1.0f);
+        m_vetex_shader.set_uniform_matrix("model", line_model);
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        x_axis.draw();
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+        y_axis.draw();
+        m_vetex_shader.set_uniform_vec4("color", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+        z_axis.draw();
+
+        check_for_opengl_error();   
     }
 
     void process_input(float delta_time)
@@ -114,13 +136,14 @@ public:
         : Window(width, height, "Test")
         , m_width(width)
         , m_height(height)
-        , m_vetex_and_color_shader("./test/basic.vert", "./test/basic.frag")
-        , m_vetex_shader("./test/planeMesh.vert", "./test/planeMesh.frag")
+        , m_vetex_and_color_shader("../test/basic.vert", "../test/basic.frag")
+        , m_vetex_shader("../test/planeMesh.vert", "../test/planeMesh.frag")
     {
         set_mouse_capture(true);
         // set_wireframe_mode(true);
 
         plane.load(10.0f, 10.0f, 3, 3);
+        sphere.load(2.0f, 20, 20);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         m_camera.set_screen_size(width, height);
@@ -128,6 +151,11 @@ public:
         m_camera.m_position = glm::vec3(0.0f, 1.0f, 3.0f);
         m_vetex_and_color_shader.compile();
         m_vetex_shader.compile();
+
+        x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
+        y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
+        z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
+        check_for_opengl_error();
     }
 };
 

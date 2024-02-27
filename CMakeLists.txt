@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 # PROPERTIES 
 # RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR})
 
-set(EXECUTABLE_OUTPUT_PATH Dir_where_executable_program_is_located)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR})
 
 
 include(FetchContent)
@@ -64,6 +64,8 @@ add_library(renderer
     "renderer/glad.c"
     "renderer/Camera.cpp"
     "renderer/PlaneMesh.cpp"
+    "renderer/Sphere.cpp"
+    "renderer/Line.cpp"
 
     "common/Entity.cpp"
     "common/Rect.cpp"
