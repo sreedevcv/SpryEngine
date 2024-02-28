@@ -31,7 +31,10 @@ public:
     void set_uniform_matrix(const char *name, glm::mat4& value);
     void set_uniform_vec(const char *name, glm::vec4&& value);
     void set_uniform_vec(const char *name, glm::vec3&& value);
+
     void set_uniform_vec(const char *name, glm::vec4& value);
     void set_uniform_vec(const char *name, glm::vec3& value);
+
+    void set_uniform_int(const char *name, int value);
 };
 }

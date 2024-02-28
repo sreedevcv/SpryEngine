@@ -110,4 +110,5 @@ void spry::BasicMesh::draw(GLenum mode)
     } else {
         glDrawArrays(mode, 0, m_vertex_count);
     }
+    glBindVertexArray(0);
 }

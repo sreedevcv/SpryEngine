@@ -13,6 +13,8 @@
 #include "Sphere.hpp"
 #include "Line.hpp"
 #include "Point.hpp"
+#include "Transform.hpp"
+#include "Material.hpp"
 
 #include "utils.hpp"
 
@@ -85,10 +87,13 @@ protected:
         // cube.draw();
         sphere.draw();
 
-        // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        // m_light_shader.set_uniform_matrix("model", model);
-        // m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.8, 0.6, 1.0));
-        // plane.draw();
+        spry::Transform plane_transform;
+        plane_transform.set_translation(glm::vec3(-5.0f, 0.0f, 5.0f));
+        plane_transform.set_rotation(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        m_light_shader.set_uniform_matrix("model", plane_transform.get_model());
+        m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.8, 0.6, 1.0));
+        plane.draw();
 
         check_for_opengl_error();
         // close_window();

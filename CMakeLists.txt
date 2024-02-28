@@ -27,6 +27,19 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
+#ASSIMP
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp
+    GIT_TAG 01231d0e6001f555c81dcfcc6c581fa5797ccac9
+)
+
+set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE) 
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE) 
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE) 
+set(ASSIMP_WARNINGS_AS_ERRORS ON CACHE BOOL "" FORCE) 
+FetchContent_MakeAvailable(assimp)
+
 # GLM
 FetchContent_Declare(
     glm
@@ -34,7 +47,7 @@ FetchContent_Declare(
     GIT_TAG 33b0eb9fa336ffd8551024b1d2690e418014553b
 )
 set(GLM_BUILD_TESTS OFF)
-# set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_MakeAvailable(glm)
 
 # MATH
@@ -61,12 +74,17 @@ add_library(renderer
     "renderer/Cuboid.cpp"
     "renderer/Tetrahedron.cpp"
     "renderer/BasicMesh.cpp"
+    "renderer/Texture.cpp"
     "renderer/glad.c"
     "renderer/Camera.cpp"
     "renderer/PlaneMesh.cpp"
     "renderer/Sphere.cpp"
     "renderer/Line.cpp"
     "renderer/Point.cpp"
+    "renderer/Transform.cpp"
+    "renderer/Mesh.cpp"
+    "renderer/Model.cpp"
+    # "renderer/Material.hpp"
 
     "common/Entity.cpp"
     "common/Rect.cpp"
@@ -75,6 +93,7 @@ add_library(renderer
 target_link_libraries(renderer
     glfw
     glm::glm
+    assimp
 )
 
 include_directories("include")
