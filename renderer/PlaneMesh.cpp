@@ -31,6 +31,11 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
             vertices.push_back(vertex.x);
             vertices.push_back(vertex.y);
             vertices.push_back(vertex.z);
+
+            // normals
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(1.0f);
         }
     }
 
@@ -58,7 +63,7 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
     vertices.shrink_to_fit();
     indices.shrink_to_fit();
 
-    int format[] = { 3 };
+    int format[] = { 3, 3 };
     m_mesh.load_data(std::span<float> { vertices }, std::span<int> { indices }, std::span<int> { format });
 }
 

@@ -41,9 +41,17 @@ protected:
         process_input(delta_time);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
-        // float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
-        // glm::vec3 light_pos = glm::vec3(x, 30.0f, z);
+        float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
+        float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
+        glm::vec3 light_pos = glm::vec3(1.2f, 1.0f, 2.0f);
+
+        glm::vec3 light_color;
+        light_color.x = sin(glfwGetTime() * 2.0f);
+        light_color.y = sin(glfwGetTime() * 0.7f);
+        light_color.z = sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuse_color = light_color * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuse_color * glm::vec3(0.2f);
 
         auto model = glm::mat4(1.0f);
         // model = glm::scale(model, glm::vec3(10.0f, 2.0f, 10.0f));
@@ -59,13 +67,28 @@ protected:
         m_light_shader.set_uniform_matrix("model", model);
         m_light_shader.set_uniform_matrix("view", view);
         m_light_shader.set_uniform_matrix("projection", projection);
-        m_light_shader.set_uniform_vec("light_color", glm::vec3(1.0f, 1.0f, 1.0f));
+
+        m_light_shader.set_uniform_vec("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        m_light_shader.set_uniform_vec("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        m_light_shader.set_uniform_vec("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        m_light_shader.set_uniform_float("material.shininess", 32.0f);
+
+        // m_light_shader.set_uniform_vec("light.position", light_pos);
+        m_light_shader.set_uniform_vec("light.position", glm::vec3(0.0f, 10.f, 20.0f));
+        m_light_shader.set_uniform_vec("light.ambient", ambientColor);
+        m_light_shader.set_uniform_vec("light.diffuse", diffuse_color); // darken diffuse light a bit
+        m_light_shader.set_uniform_vec("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
         m_light_shader.set_uniform_vec("object_color", glm::vec4(0.5, 0.7, 0.6, 1.0));
-        // m_light_shader.set_uniform_vec("light_pos", light_pos);
-        m_light_shader.set_uniform_vec("light_pos", glm::vec3(0.0f, 40.f, 20.0f));
         m_light_shader.set_uniform_vec("view_pos", m_camera.m_position);
+
         // cube.draw();
         sphere.draw();
+
+        // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        // m_light_shader.set_uniform_matrix("model", model);
+        // m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.8, 0.6, 1.0));
+        // plane.draw();
 
         check_for_opengl_error();
         // close_window();
@@ -218,7 +241,7 @@ public:
         point_vec.shrink_to_fit();
 
         point.load(std::span<glm::vec3> { point_vec });
-        point.set_point_size(10.0f);
+        point.set_point_size(1.0f);
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
