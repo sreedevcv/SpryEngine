@@ -1,18 +1,21 @@
 #include "Transform.hpp"
 
-void spry::Transform::set_scale(const glm::vec3& scale)
+spry::Transform& spry::Transform::scale(const glm::vec3& scale)
 {
     model = glm::scale(model, scale);
+    return *this;
 }
 
-void spry::Transform::set_translation(const glm::vec3& location)
+spry::Transform& spry::Transform::translate(const glm::vec3& location)
 {
     model = glm::translate(model, location);
+    return *this;
 }
 
-void spry::Transform::set_rotation(float angle, const glm::vec3& axis)
+spry::Transform& spry::Transform::rotate(float angle, const glm::vec3& axis)
 {
     model = glm::rotate(model, angle, axis);
+    return *this;
 }
 
 glm::mat4& spry::Transform::get_model()

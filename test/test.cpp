@@ -21,7 +21,6 @@
 
 #include <stb_image.h>
 
-
 class MyWindow : public spry::Window {
 private:
     int m_width = 600;
@@ -44,15 +43,14 @@ private:
     spry::Cuboid cube;
     spry::Model backpack_model;
 
-
 protected:
     void update_frame(float delta_time) override
     {
         process_input(delta_time);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
-        //float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
+        // float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
+        // float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
         glm::vec3 light_pos = glm::vec3(1.2f, 1.0f, 2.0f);
         glm::vec3 light_color = glm::vec3(0.6f, 0.3f, 0.4f);
         glm::vec3 diffuse_color = light_color * glm::vec3(0.5f);
@@ -88,11 +86,12 @@ protected:
         // cube.draw();
         // sphere.draw();
 
-        spry::Transform plane_transform;
-        plane_transform.set_translation(glm::vec3(-5.0f, 0.0f, 5.0f));
-        plane_transform.set_rotation(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        auto plane_model = spry::Transform()
+                               .translate(glm::vec3(-5.0f, 0.0f, 5.0f))
+                               .rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
+                               .get_model();
 
-        m_light_shader.set_uniform_matrix("model", plane_transform.get_model());
+        m_light_shader.set_uniform_matrix("model", plane_model);
         m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.8, 0.6, 1.0));
         plane.draw();
 
@@ -254,15 +253,15 @@ public:
         m_light_shader.compile();
         m_model_shader.compile();
 
-        //std::vector<glm::vec3> point_vec = {
-        //    glm::vec3(0.0f, 0.0f, 0.0f),
-        //    glm::vec3(1.0f, 1.0f, 1.0f),
-        //    glm::vec3(-1.0f, -1.0f, -1.0f),
-        //    glm::vec3(1.0f, 3.0f, -4.0f),
-        //};
-        //point_vec.shrink_to_fit();
-        //point.load(point_vec);
-        //point.set_point_size(1.0f);
+        // std::vector<glm::vec3> point_vec = {
+        //     glm::vec3(0.0f, 0.0f, 0.0f),
+        //     glm::vec3(1.0f, 1.0f, 1.0f),
+        //     glm::vec3(-1.0f, -1.0f, -1.0f),
+        //     glm::vec3(1.0f, 3.0f, -4.0f),
+        // };
+        // point_vec.shrink_to_fit();
+        // point.load(point_vec);
+        // point.set_point_size(1.0f);
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
@@ -273,7 +272,7 @@ public:
 
 int main(int argc, char** argv)
 {
-stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true);
 
     MyWindow w(800, 600);
     w.start();

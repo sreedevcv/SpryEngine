@@ -21,6 +21,7 @@ void spry::Model::load_model(const std::string &path) {
 
     m_directory = path.substr(0, path.find_last_of('/'));
     process_node(scene->mRootNode, scene);
+    std::cout << "Loaded model: " << path << "\n";
 }
 
 void spry::Model::process_node(aiNode *node, const aiScene *scene) {

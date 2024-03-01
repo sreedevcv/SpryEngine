@@ -11,9 +11,9 @@ private:
     glm::mat4 model = glm::mat4(1.0f);
 
 public:
-    void set_scale(const glm::vec3& scale);
-    void set_translation(const glm::vec3& location);
-    void set_rotation(float angle, const glm::vec3& axis);
+    Transform& scale(const glm::vec3& scale);
+    Transform& translate(const glm::vec3& location);
+    Transform& rotate(float angle, const glm::vec3& axis);
 
     glm::mat4& get_model();
 };
