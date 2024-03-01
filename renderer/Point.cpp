@@ -4,16 +4,17 @@ spry::Point::Point()
 {
 }
 
-spry::Point::Point(std::span<glm::vec3> points)
+spry::Point::Point(std::vector<glm::vec3>& points)
 {
     load(points);
 }
 
-void spry::Point::load(std::span<glm::vec3> points)
+void spry::Point::load(std::vector<glm::vec3>& points)
 {
-    int format[] = {3};
-    std::span<float> p {(float*)points.data(), points.size() * 3};
-    m_mesh.load_data(p, format);
+    std::vector<int> format = {3};
+    // std::vector<float> p(points.begin(), points.end());
+    // m_mesh.load_data(p, format);
+    m_mesh.load_data(points, format);
 }
 
 void spry::Point::draw()

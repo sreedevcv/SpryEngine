@@ -1,7 +1,6 @@
 #include "Sphere.hpp"
 
 #include <vector>
-#include <span>
 #include <cmath>
 #include <glm/glm.hpp>
 
@@ -9,7 +8,7 @@ void spry::Sphere::load(const float radius, const int sectors, const int stacks)
 {
     std::vector<float> vertices;
     std::vector<float> normals;
-    std::vector<int> indices;
+    std::vector<unsigned int> indices;
 
     float PI = glm::pi<float>();
     float length_inverse = 1.0f / radius;
@@ -66,12 +65,12 @@ void spry::Sphere::load(const float radius, const int sectors, const int stacks)
         }
     }
 
-    vertices.shrink_to_fit();
-    indices.shrink_to_fit();
+    // vertices.shrink_to_fit();
+    // indices.shrink_to_fit();
 
-    int format[] = { 3, 3 };
+    std::vector<int> format = { 3, 3 };
 
-    m_mesh.load_data(std::span<float> { vertices }, std::span<int> { indices }, std::span<int> { format });
+    m_mesh.load_data(vertices, indices, format);
 }
 
 void spry::Sphere::draw()

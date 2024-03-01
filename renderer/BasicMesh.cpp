@@ -5,17 +5,6 @@ spry::BasicMesh::BasicMesh()
 {
 }
 
-spry::BasicMesh::BasicMesh(std::span<float> vertices, std::span<int> indices, std::span<int> format)
-    : m_vertex_count(indices.size())
-{
-    load_data(vertices, indices, format);
-}
-
-spry::BasicMesh::BasicMesh(std::span<float> vertices, std::span<int> format)
-{
-    load_data(vertices, format);
-}
-
 void spry::BasicMesh::delete_buffers()
 {
     glDeleteVertexArrays(1, &VAO);
@@ -32,75 +21,77 @@ spry::BasicMesh::~BasicMesh()
     delete_buffers();
 }
 
-void spry::BasicMesh::load_data(std::span<float> vertices, std::span<int> indices, std::span<int> format)
-{
-    if (m_data_loaded) {
-        // std::cout << "Cannot reload data\n";
-        // return;
-        delete_buffers();
-    }
+// template<class T>
+// void spry::BasicMesh::load_data(std::vector<T>& vertices, std::vector<unsigned int>& indices, std::vector<int>& format)
+// {
+//     if (m_data_loaded) {
+//         // std::cout << "Cannot reload data\n";
+//         // return;
+//         delete_buffers();
+//     }
 
-    m_vertex_count = indices.size();
-    m_data_loaded = true;
-    index_array = true;
+//     m_vertex_count = indices.size();
+//     m_data_loaded = true;
+//     index_array = true;
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+//     glGenVertexArrays(1, &VAO);
+//     glGenBuffers(1, &VBO);
+//     glGenBuffers(1, &EBO);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), (void*)vertices.data(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), (void*)indices.data(), GL_STATIC_DRAW);
+//     glBindVertexArray(VAO);
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), (void*)vertices.data(), GL_STATIC_DRAW);
+//     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), (void*)indices.data(), GL_STATIC_DRAW);
 
-    int stride = 0;
-    for (int attribSize : format) {
-        stride += attribSize;
-    }
+//     int stride = 0;
+//     for (int attribSize : format) {
+//         stride += attribSize;
+//     }
 
-    long prevAttribSize = 0;
-    for (int i = 0; i < format.size(); i++) {
-        int attribSize = format[i];
-        glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(prevAttribSize * sizeof(float)));
-        glEnableVertexAttribArray(i);
-        prevAttribSize += attribSize;
-    }
-}
+//     long prevAttribSize = 0;
+//     for (int i = 0; i < format.size(); i++) {
+//         int attribSize = format[i];
+//         glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(prevAttribSize * sizeof(float)));
+//         glEnableVertexAttribArray(i);
+//         prevAttribSize += attribSize;
+//     }
+// }
 
-void spry::BasicMesh::load_data(std::span<float> vertices, std::span<int> format)
-{
-    if (m_data_loaded) {
-        // std::cout << "Cannot reload data\n";
-        // return;
-        delete_buffers();
-    }
+// template<class T>
+// void spry::BasicMesh::load_data(std::vector<T>& vertices, std::vector<int>& format)
+// {
+//     if (m_data_loaded) {
+//         // std::cout << "Cannot reload data\n";
+//         // return;
+//         delete_buffers();
+//     }
 
-    m_data_loaded = true;
-    index_array = false;
+//     m_data_loaded = true;
+//     index_array = false;
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+//     glGenVertexArrays(1, &VAO);
+//     glGenBuffers(1, &VBO);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), (void*)vertices.data(), GL_STATIC_DRAW);
+//     glBindVertexArray(VAO);
+//     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(T), (void*)vertices.data(), GL_STATIC_DRAW);
 
-    int stride = 0;
-    for (int attribSize : format) {
-        stride += attribSize;
-    }
+//     int stride = 0;
+//     for (int attribSize : format) {
+//         stride += attribSize;
+//     }
     
-    m_vertex_count = vertices.size() / stride;
+//     m_vertex_count = vertices.size() / stride;
 
-    long prevAttribSize = 0;
-    for (int i = 0; i < format.size(); i++) {
-        int attribSize = format[i];
-        glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(prevAttribSize * sizeof(float)));
-        glEnableVertexAttribArray(i);
-        prevAttribSize += attribSize;
-    }
-}
+//     long prevAttribSize = 0;
+//     for (int i = 0; i < format.size(); i++) {
+//         int attribSize = format[i];
+//         glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(prevAttribSize * sizeof(float)));
+//         glEnableVertexAttribArray(i);
+//         prevAttribSize += attribSize;
+//     }
+// }
 
 void spry::BasicMesh::draw(GLenum mode)
 {
@@ -111,4 +102,36 @@ void spry::BasicMesh::draw(GLenum mode)
         glDrawArrays(mode, 0, m_vertex_count);
     }
     glBindVertexArray(0);
+    check_for_opengl_error();
+}
+
+void spry::BasicMesh::operator=(BasicMesh& mesh)
+{
+    if (this != &mesh) {
+
+    }
+}
+
+void spry::BasicMesh::operator=(BasicMesh&& mesh)
+{
+}
+
+spry::BasicMesh::BasicMesh(BasicMesh& mesh)
+{
+    // if (this != &mesh) {
+    //     this->VAO = mesh.VAO;
+    //     this->EBO = mesh.EBO;
+    //     this->VBO = mesh.VBO;
+    //     this->m_vertex_count = mesh.m_vertex_count;
+    // }
+}
+
+spry::BasicMesh::BasicMesh(BasicMesh&& mesh)
+{
+    if (this != &mesh) {
+        this->VAO = mesh.VAO;
+        this->EBO = mesh.EBO;
+        this->VBO = mesh.VBO;
+        this->m_vertex_count = mesh.m_vertex_count;
+    }
 }

@@ -30,12 +30,12 @@ void spry::Line::draw()
 
 void spry::Line::load_mesh()
 {
-    float vertices[] = {
+    std::vector<float> vertices = {
         m_start.x, m_start.y, m_start.z,
         m_end.x, m_end.y, m_end.z,
     };
 
-    int format[] = {3};
-    m_mesh.load_data(std::span<float>{vertices}, std::span<int>{format});
+    std::vector<int> format = {3};
+    m_mesh.load_data(vertices, format);
 }
 

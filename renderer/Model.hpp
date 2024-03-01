@@ -7,7 +7,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-
 #include "Mesh.hpp"
 
 namespace spry {
@@ -24,7 +23,7 @@ private:
     std::vector<Mesh::Texture> load_material_textures(aiMaterial* mat, aiTextureType type, std::string type_name);
 
 public:
-    Model(char *path);
+    Model(const char *path);
     void draw(Shader& shader);
 };
 

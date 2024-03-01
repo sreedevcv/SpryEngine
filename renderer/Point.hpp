@@ -1,6 +1,6 @@
 #pragma once
 
-#include <span>
+#include <vector>
 
 #include <glm/vec3.hpp>
 
@@ -14,10 +14,10 @@ private:
 
 public:
     Point();
-    Point(std::span<glm::vec3> points);
+    Point(std::vector<glm::vec3>& points);
     ~Point() = default;
 
-    void load(std::span<glm::vec3> points);
+    void load(std::vector<glm::vec3>& points);
     void draw();
     void set_point_size(float size);
 };

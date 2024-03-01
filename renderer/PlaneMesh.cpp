@@ -39,7 +39,7 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
         }
     }
 
-    std::vector<int> indices;
+    std::vector<unsigned int> indices;
     int count = 0;
 
     for (int i = 0; i < length_segments; i++) {
@@ -60,11 +60,11 @@ void spry::PlaneMesh::load(float length, float breadth, int length_segments, int
         }
     }
 
-    vertices.shrink_to_fit();
-    indices.shrink_to_fit();
+    // vertices.shrink_to_fit();
+    // indices.shrink_to_fit();
 
-    int format[] = { 3, 3 };
-    m_mesh.load_data(std::span<float> { vertices }, std::span<int> { indices }, std::span<int> { format });
+    std::vector<int> format = { 3, 3 };
+    m_mesh.load_data(vertices, indices,  format);
 }
 
 void spry::PlaneMesh::draw()
