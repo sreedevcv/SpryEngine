@@ -116,7 +116,7 @@ void spry::Shader::set_uniform_vec(const char* name, glm::vec3& value)
     glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
-void spry::Shader::set_uniform_int(const char* name, int value)
+void spry::Shader::set_uniform_int(const char* name, int value) const
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform1i(loc, value);
