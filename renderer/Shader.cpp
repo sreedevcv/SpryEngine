@@ -37,6 +37,13 @@ void spry::Shader::compile()
     const char* vertCodeStr = vertCode.c_str();
     const char* fragCodeStr = fragCode.c_str();
 
+    compile_shader_code(vertCodeStr, fragCodeStr);
+
+    check_for_opengl_error();
+}
+
+void spry::Shader::compile_shader_code(const char* vertex, const char* fragment)
+{
     const auto getError = [&](unsigned int shader, bool is_vert_shader = true, bool is_program = false) {
         int success;
         char log[1024];
@@ -59,12 +66,12 @@ void spry::Shader::compile()
     };
 
     unsigned int vertShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertShader, 1, &vertCodeStr, nullptr);
+    glShaderSource(vertShader, 1, &vertex, nullptr);
     glCompileShader(vertShader);
     getError(vertShader);
 
     unsigned int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragShader, 1, &fragCodeStr, nullptr);
+    glShaderSource(fragShader, 1, &fragment, nullptr);
     glCompileShader(fragShader);
     getError(fragShader, false);
 
@@ -76,8 +83,6 @@ void spry::Shader::compile()
 
     glDeleteShader(vertShader);
     glDeleteShader(fragShader);
-
-    check_for_opengl_error();
 }
 
 void spry::Shader::use()
@@ -107,7 +112,6 @@ void spry::Shader::set_uniform_vec(const char* name, glm::vec4&& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform4fv(loc, 1, glm::value_ptr(value));
-    // glUniform4f(loc, value.x, value.y, value.z, value.w);
 }
 
 void spry::Shader::set_uniform_vec(const char* name, glm::vec3& value)
@@ -126,5 +130,67 @@ void spry::Shader::set_uniform_vec(const char* name, glm::vec4& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform4fv(loc, 1, glm::value_ptr(value));
-    // glUniform4f(loc, value.x, value.y, value.z, value.w);
+}
+
+spry::Shader spry::Shader::simple_shader()
+{
+    Shader shader("", "");
+    shader.mHasCompiled = true;
+
+    const char *vert_shader = R"(
+        #version 330
+        layout (location = 0) in vec3 apos;
+
+        void main() {
+            gl_Position = vec4(apos, 1.0);
+        }
+    )";
+
+    const char *frag_shader = R"(
+        #version 330 core 
+
+        out vec4 frag_color;
+        in vec4 color;
+
+        void main() {
+            frag_color = color;
+        }
+    )";
+
+    shader.compile_shader_code(vert_shader, frag_shader);
+    return shader;
+}
+
+spry::Shader spry::Shader::mvp_shader()
+{
+    Shader shader("", "");
+    shader.mHasCompiled = true;
+
+    const char *vert_shader = R"(
+        #version 330
+        layout (location = 0) in vec3 apos;
+
+        uniform mat4 model;
+        uniform mat4 view;
+        uniform mat4 projection;
+
+        void main() {
+            gl_Position = projection * view * model * vec4(apos, 1.0);
+        }
+    )";
+
+    const char *frag_shader = R"(
+        #version 330 core 
+
+        out vec4 frag_color;
+        
+        uniform vec4 color;
+
+        void main() {
+            frag_color = color;
+        }
+    )";
+
+    shader.compile_shader_code(vert_shader, frag_shader);
+    return shader;
 }

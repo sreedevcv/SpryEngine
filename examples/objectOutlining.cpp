@@ -26,14 +26,10 @@ private:
     int m_width = 600;
     int m_height = 400;
 
-    spry::Shader m_vetex_and_color_shader;
-    spry::Shader m_vetex_shader;
+    spry::Shader m_vetex_shader = spry::Shader::mvp_shader();
     spry::Shader m_light_shader;
-    spry::Shader m_model_shader;
 
     spry::Camera m_camera;
-    spry::Tetrahedron tetra;
-    spry::PlaneMesh plane;
     spry::Sphere sphere;
     spry::Line x_axis;
     spry::Line y_axis;
@@ -41,13 +37,15 @@ private:
     spry::Point point;
 
     spry::Cuboid cube;
-    spry::Model backpack_model;
 
 protected:
     void update_frame(float delta_time) override
     {
         process_input(delta_time);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  // Update only when both stencil test and depth test passes
+        // glStencilFunc(GL_ALWAYS, 1, 0xFF);          // all fragments pass the stencil test
+        // glStencilMask(0xFF);                        // enable writing to stencil buffer
 
         // float x = glm::abs(glm::sin(get_global_time())) * 30.0f;
         // float z = glm::abs(glm::cos(get_global_time())) * 30.0f;
@@ -70,8 +68,8 @@ protected:
         m_light_shader.set_uniform_matrix("view", view);
         m_light_shader.set_uniform_matrix("projection", projection);
 
-        m_light_shader.set_uniform_vec("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-        m_light_shader.set_uniform_vec("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        m_light_shader.set_uniform_vec("material.ambient", glm::vec3(1.0f, 0.8f, 0.71f));
+        m_light_shader.set_uniform_vec("material.diffuse", glm::vec3(1.0f, 0.8f, 0.81f));
         m_light_shader.set_uniform_vec("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
         m_light_shader.set_uniform_float("material.shininess", 32.0f);
 
@@ -80,32 +78,15 @@ protected:
         m_light_shader.set_uniform_vec("light.diffuse", diffuse_color);
         m_light_shader.set_uniform_vec("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        m_light_shader.set_uniform_vec("object_color", glm::vec4(0.5, 0.7, 0.6, 1.0));
+        m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.7, 0.8, 1.0));
         m_light_shader.set_uniform_vec("view_pos", m_camera.m_position);
 
-        // cube.draw();
+        cube.draw();
         // sphere.draw();
 
-        auto plane_model = spry::Transform()
-                               .translate(glm::vec3(-5.0f, 0.0f, 5.0f))
-                               .rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f))
-                               .get_model();
-
-        m_light_shader.set_uniform_matrix("model", plane_model);
-        m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.8, 0.6, 1.0));
-        plane.draw();
-
-        m_model_shader.use();
-        check_for_opengl_error();
-
-        m_model_shader.set_uniform_matrix("model", model);
-        m_model_shader.set_uniform_matrix("view", view);
-        check_for_opengl_error();
-
-        m_model_shader.set_uniform_matrix("projection", projection);
-        check_for_opengl_error();
-
-        backpack_model.draw(m_model_shader);
+        // glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        // glStencilMask(0x00);
+        // glDisable(GL_DEPTH_TEST);
 
         check_for_opengl_error();
         //  close_window();
@@ -166,54 +147,6 @@ protected:
         m_camera.set_screen_size(width, height);
     }
 
-    void draw_basic_scene()
-    {
-        float angle = get_global_time();
-
-        auto view = m_camera.get_view_matrix();
-        auto projection = m_camera.get_projection_matrix();
-
-        auto cube_model = glm::mat4(1.0f);
-        cube_model = glm::rotate(cube_model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        cube_model = glm::translate(cube_model, glm::vec3(0.0f, sin(angle * 0.5f), 0.0f));
-        cube_model = glm::scale(cube_model, glm::vec3(1.5f, 1.5f, 1.5f));
-
-        m_vetex_and_color_shader.use();
-        m_vetex_and_color_shader.set_uniform_matrix("model", cube_model);
-        m_vetex_and_color_shader.set_uniform_matrix("view", view);
-        m_vetex_and_color_shader.set_uniform_matrix("projection", projection);
-        tetra.draw();
-
-        auto plane_model = glm::mat4(1.0f);
-        plane_model = glm::translate(plane_model, glm::vec3(-5.0f, -3.0f, -5.0f));
-        plane_model = glm::rotate(plane_model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-        m_vetex_shader.use();
-        m_vetex_shader.set_uniform_matrix("model", plane_model);
-        m_vetex_shader.set_uniform_matrix("view", view);
-        m_vetex_shader.set_uniform_matrix("projection", projection);
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(1.0f, 0.9f, 0.8f, 1.0f));
-        plane.draw();
-
-        auto sphere_model = glm::mat4(1.0f);
-        sphere_model = glm::translate(sphere_model, glm::vec3(3.0f, 1.0f, -5.0f));
-        m_vetex_shader.set_uniform_matrix("model", sphere_model);
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(0.8f, 1.0f, 0.9f, 1.0f));
-        sphere.draw();
-
-        auto line_model = glm::mat4(1.0f);
-        m_vetex_shader.set_uniform_matrix("model", line_model);
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        x_axis.draw();
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-        y_axis.draw();
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-        z_axis.draw();
-
-        m_vetex_shader.set_uniform_vec("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        point.draw();
-    }
-
     void draw_axes()
     {
         auto line_model = glm::mat4(1.0f);
@@ -231,16 +164,12 @@ public:
         : Window(width, height, "Test")
         , m_width(width)
         , m_height(height)
-        , m_vetex_and_color_shader("./test/basic.vert", "./test/basic.frag")
-        , m_vetex_shader("./test/planeMesh.vert", "./test/planeMesh.frag")
-        , m_light_shader("./test/lighting.vert", "./test/lighting.frag")
-        , m_model_shader("./test/model.vert", "./test/model.frag")
-        , backpack_model("./test/models/backpack/backpack.obj")
+        , m_light_shader("./examples/lighting.vert", "./examples/lighting.frag")
     {
-        set_mouse_capture(true);
-        // set_wireframe_mode(true);
+        // glEnable(GL_STENCIL_TEST);
 
-        plane.load(10.0f, 10.0f, 5, 5);
+        set_mouse_capture(true);
+
         // sphere.load(2.0f, 20, 20);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -248,20 +177,8 @@ public:
         m_camera.mouse_data.first_mouse = true;
         m_camera.m_position = glm::vec3(0.0f, 1.0f, 3.0f);
 
-        m_vetex_and_color_shader.compile();
-        m_vetex_shader.compile();
         m_light_shader.compile();
-        m_model_shader.compile();
 
-        // std::vector<glm::vec3> point_vec = {
-        //     glm::vec3(0.0f, 0.0f, 0.0f),
-        //     glm::vec3(1.0f, 1.0f, 1.0f),
-        //     glm::vec3(-1.0f, -1.0f, -1.0f),
-        //     glm::vec3(1.0f, 3.0f, -4.0f),
-        // };
-        // point_vec.shrink_to_fit();
-        // point.load(point_vec);
-        // point.set_point_size(1.0f);
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
@@ -270,14 +187,14 @@ public:
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
-//     w.start();
-//     return 0;
-// }
+    MyWindow w(800, 600);
+    w.start();
+    return 0;
+}
 
 /* ray tracer
  * fogs

@@ -101,6 +101,7 @@ add_executable(spryengine
     # "test/main.cpp"
     "examples/test.cpp"
     "examples/RubiksCube.cpp"
+    "examples/objectOutlining.cpp"
 )
 
 target_link_libraries(
