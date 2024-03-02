@@ -7,15 +7,12 @@
 #include "Cuboid.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
-#include "Tetrahedron.hpp"
 #include "Camera.hpp"
-#include "PlaneMesh.hpp"
-#include "Sphere.hpp"
 #include "Line.hpp"
-#include "Point.hpp"
 #include "Transform.hpp"
-#include "Material.hpp"
-#include "Model.hpp"
+#include "PlaneMesh.hpp"
+#include "Quad.hpp"
+#include "Texture.hpp"
 
 #include "utils.hpp"
 
@@ -27,30 +24,24 @@ private:
     int m_height = 400;
 
     spry::Shader shader = spry::ShaderManager::mvp_shader();
-    spry::Shader m_light_shader;
-
+    spry::Shader grass_quad_shader;
     spry::Camera m_camera;
-    spry::Sphere sphere;
     spry::Line x_axis;
     spry::Line y_axis;
     spry::Line z_axis;
-    spry::Point point;
-
     spry::Cuboid cube;
+    spry::PlaneMesh plane;
+    spry::Quad quad;
+    spry::Transform plane_transform;
+    spry::Texture grass_texture;
+
+    std::vector<glm::vec3> vegetation;
 
 protected:
     void update_frame(float delta_time) override
     {
         process_input(delta_time);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // Update only when both stencil test and depth test passes
-        glStencilMask(0x00);
-
-        glm::vec3 light_pos = glm::vec3(1.2f, 1.0f, 2.0f);
-        glm::vec3 light_color = glm::vec3(0.6f, 0.3f, 0.4f);
-        glm::vec3 diffuse_color = light_color * glm::vec3(0.5f);
-        glm::vec3 ambientColor = diffuse_color * glm::vec3(0.2f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         auto model = glm::mat4(1.0f);
         auto view = m_camera.get_view_matrix();
@@ -61,46 +52,37 @@ protected:
         shader.set_uniform_matrix("view", view);
         draw_axes();
 
-        m_light_shader.use();
-        m_light_shader.set_uniform_matrix("model", model);
-        m_light_shader.set_uniform_matrix("view", view);
-        m_light_shader.set_uniform_matrix("projection", projection);
-
-        m_light_shader.set_uniform_vec("material.ambient", glm::vec3(1.0f, 0.8f, 0.71f));
-        m_light_shader.set_uniform_vec("material.diffuse", glm::vec3(1.0f, 0.8f, 0.81f));
-        m_light_shader.set_uniform_vec("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-        m_light_shader.set_uniform_float("material.shininess", 32.0f);
-
-        m_light_shader.set_uniform_vec("light.position", glm::vec3(0.0f, 10.f, 20.0f));
-        m_light_shader.set_uniform_vec("light.ambient", ambientColor);
-        m_light_shader.set_uniform_vec("light.diffuse", diffuse_color);
-        m_light_shader.set_uniform_vec("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        m_light_shader.set_uniform_vec("object_color", glm::vec4(0.8, 0.7, 0.8, 1.0));
-        m_light_shader.set_uniform_vec("view_pos", m_camera.m_position);
-
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
-
+        // shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.9f, 1.0f));
         // cube.draw();
-        sphere.draw();
+        // shader.set_uniform_matrix("model", spry::Transform().rotate(glm::radians(get_global_time() * 40), glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f))).get_model());
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
-
-        shader.use();
-        shader.set_uniform_matrix("model", spry::Transform().scale(glm::vec3(1.02f, 1.02f, 1.02f)).get_model());
-        shader.set_uniform_vec("color", glm::vec4(1.0f, 1.0f, 0.8f, 1.0f));
-        // cube.draw();
-        sphere.draw();
-
-        glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glEnable(GL_DEPTH_TEST);
+        shader.set_uniform_vec("color", glm::vec4(0.5f, 0.4f, 0.4f, 1.0f));
+        shader.set_uniform_matrix("model", plane_transform.get_model());
+        plane.draw();
 
         check_for_opengl_error();
-        //  close_window();
+        grass_quad_shader.use();
+        check_for_opengl_error();
+        grass_quad_shader.set_uniform_matrix("view", view);
+        grass_quad_shader.set_uniform_matrix("projection", projection);
+        check_for_opengl_error();
+
+        grass_texture.bind();
+        for (auto loc : vegetation) {
+            loc.y += 0.5;
+            float angle = get_signed_angle(glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(m_camera.m_position), glm::vec3(0.0f, 1.0f, 0.0f));
+
+            auto grass_quad_model = spry::Transform()
+                                        .rotate(angle, glm::vec3(0.0f, 1.0f, 0.0f))
+                                        .translate(loc)
+                                        .scale(glm::vec3(0.5f, 0.5f, 0.5f))
+                                        .get_model();
+            grass_quad_shader.set_uniform_matrix("model", grass_quad_model);
+            quad.draw();
+        }
+
+        check_for_opengl_error();
+        // close_window();
     }
 
     void process_input(float delta_time)
@@ -172,42 +154,84 @@ protected:
 
 public:
     MyWindow(int width, int height)
-        : Window(width, height, "Test")
+        : Window(width, height, "Blending")
         , m_width(width)
         , m_height(height)
-        , m_light_shader("./examples/lighting.vert", "./examples/lighting.frag")
     {
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_STENCIL_TEST);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
         set_mouse_capture(true);
 
-        sphere.load(2.0f, 20, 20);
+        grass_texture.texture_from_file("grass.png", "./examples");
 
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
         m_camera.m_position = glm::vec3(0.0f, 1.0f, 3.0f);
 
-        m_light_shader.compile();
+        plane.load(10.0f, 10.0f, 10, 13);
+        plane_transform
+            .translate(glm::vec3(-5.0f, 0.0f, 5.0f))
+            .rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
         z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
 
+        vegetation.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
+        vegetation.push_back(glm::vec3(1.5f, 0.0f, 0.51f));
+        vegetation.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
+        vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
+        vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
+
+        // grass_quad_shader = spry::ShaderManager::create_shader(
+        grass_quad_shader.set_shader_code(
+            R"(
+                #version 330 core
+                layout (location = 0) in vec3 position;
+                layout (location = 1) in vec3 normal;
+                layout (location = 2) in vec2 tex_coord;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                out vec2 texCoord;
+
+                void main() {
+                    gl_Position = projection * view * model * vec4(position, 1.0);
+                    texCoord = tex_coord;
+                }
+            )",
+
+            R"(
+                #version 330 core
+
+                out vec4 frag_color;
+                in vec2 texCoord;
+                uniform sampler2D texture1;
+
+                void main() {
+                    vec4 tex_color = texture(texture1, texCoord);
+                    if (tex_color.a < 0.1)
+                        discard;
+                    frag_color = tex_color;
+                }
+            )");
+
         check_for_opengl_error();
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
-//     w.start();
+    MyWindow w(800, 600);
+    w.start();
 
-//     return 0;
-// }
+    return 0;
+}
 
 // /* ray tracer
 //  * fogs

@@ -237,6 +237,7 @@ public:
         , m_model_shader("./test/model.vert", "./test/model.frag")
         , backpack_model("./test/models/backpack/backpack.obj")
     {
+        glEnable(GL_DEPTH_TEST);
         set_mouse_capture(true);
         // set_wireframe_mode(true);
 

@@ -84,6 +84,7 @@ add_library(renderer
     "renderer/Transform.cpp"
     "renderer/Mesh.cpp"
     "renderer/Model.cpp"
+    "renderer/Quad.cpp"
     # "renderer/Material.hpp"
 
     "common/Entity.cpp"
@@ -102,6 +103,7 @@ add_executable(spryengine
     "examples/test.cpp"
     "examples/RubiksCube.cpp"
     "examples/objectOutlining.cpp"
+    "examples/blending.cpp"
 )
 
 target_link_libraries(

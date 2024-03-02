@@ -30,3 +30,12 @@ const auto printMat = [](const glm::mat4& m) {
 const auto printVec = [](const glm::vec3& m) {
     std::cout << m.x << " " << m.y << " " << m.z << "\n";
 };
+
+const auto get_signed_angle = [](const glm::vec3& a, const glm::vec3& b, const glm::vec3& normal) -> float
+{
+    float angle = glm::acos(glm::dot(a, b));
+    if (glm::dot(normal, glm::cross(a, b)) < 0) {
+        angle = -angle;
+    }
+    return angle;
+};

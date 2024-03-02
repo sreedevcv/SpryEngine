@@ -1,9 +1,13 @@
 #include "Shader.hpp"
 
 spry::Shader::Shader(const char* vertShaderSource, const char* fragShaderSource)
-    : mVertShaderSource(vertShaderSource)
-    , mFragShaderSource(fragShaderSource)
+    : mVert_shader_path(vertShaderSource)
+    , mFrag_shader_path(fragShaderSource)
     , mHasCompiled(false)
+{
+}
+
+spry::Shader::Shader()
 {
 }
 
@@ -23,8 +27,8 @@ void spry::Shader::compile()
     std::ifstream vertFile;
     std::ifstream fragFile;
 
-    vertFile.open(mVertShaderSource);
-    fragFile.open(mFragShaderSource);
+    vertFile.open(mVert_shader_path);
+    fragFile.open(mFrag_shader_path);
 
     std::stringstream vertStream;
     std::stringstream fragStream;
@@ -59,7 +63,7 @@ void spry::Shader::compile_shader_code(const char* vertex, const char* fragment)
                 std::cout << "[ERROR]::LINK::";
             } else {
                 glGetShaderInfoLog(shader, 1024, nullptr, log);
-                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::" << mVertShaderSource << "::";
+                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::" << mVert_shader_path << "::";
             }
             std::cout << log << std::endl;
         }
@@ -108,6 +112,7 @@ void spry::Shader::set_uniform_vec(const char* name, glm::vec3&& value)
     glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
+
 void spry::Shader::set_uniform_vec(const char* name, glm::vec4&& value)
 {
     int loc = glGetUniformLocation(ID, name);
@@ -132,12 +137,25 @@ void spry::Shader::set_uniform_vec(const char* name, glm::vec4& value)
     glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-spry::Shader spry::Shader::simple_shader()
+void spry::Shader::set_shader_paths(const char* vert_shader_path, const char* frag_shader_path)
+{
+    mVert_shader_path = vert_shader_path;
+    mFrag_shader_path = frag_shader_path;
+    mHasCompiled = false;
+}
+
+void spry::Shader::set_shader_code(const char* vert_shader_source, const char* frag_shader_source)
+{
+    compile_shader_code(vert_shader_source, frag_shader_source);
+    mHasCompiled = true;
+}
+
+spry::Shader spry::ShaderManager::simple_shader()
 {
     Shader shader("", "");
     shader.mHasCompiled = true;
 
-    const char *vert_shader = R"(
+    const char* vert_shader = R"(
         #version 330
         layout (location = 0) in vec3 apos;
 
@@ -146,7 +164,7 @@ spry::Shader spry::Shader::simple_shader()
         }
     )";
 
-    const char *frag_shader = R"(
+    const char* frag_shader = R"(
         #version 330 core 
 
         out vec4 frag_color;
@@ -161,12 +179,12 @@ spry::Shader spry::Shader::simple_shader()
     return shader;
 }
 
-spry::Shader spry::Shader::mvp_shader()
+spry::Shader spry::ShaderManager::mvp_shader()
 {
     Shader shader("", "");
     shader.mHasCompiled = true;
 
-    const char *vert_shader = R"(
+    const char* vert_shader = R"(
         #version 330
         layout (location = 0) in vec3 apos;
 
@@ -179,7 +197,7 @@ spry::Shader spry::Shader::mvp_shader()
         }
     )";
 
-    const char *frag_shader = R"(
+    const char* frag_shader = R"(
         #version 330 core 
 
         out vec4 frag_color;
@@ -192,5 +210,13 @@ spry::Shader spry::Shader::mvp_shader()
     )";
 
     shader.compile_shader_code(vert_shader, frag_shader);
+    return shader;
+}
+
+spry::Shader spry::ShaderManager::create_shader(const char* vert_code, const char* frag_code)
+{
+    Shader shader("", "");
+    shader.mHasCompiled = true;
+    shader.compile_shader_code(vert_code, frag_code);
     return shader;
 }

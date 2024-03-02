@@ -55,6 +55,8 @@ public:
         , m_height(height)
         , m_shader("../test/basic.vert", "../test/basic.frag")
     {
+        glEnable(GL_DEPTH_TEST);
+
         glClearColor(0.9, 0.8, 0.7, 1.0);
         m_shader.compile();
         m_camera.set_screen_size(width, height);
