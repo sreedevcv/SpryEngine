@@ -99,8 +99,8 @@ target_link_libraries(renderer
 include_directories("include")
 add_executable(spryengine
     # "test/main.cpp"
-    "test/test.cpp"
-    "test/RubiksCube.cpp"
+    "examples/test.cpp"
+    "examples/RubiksCube.cpp"
 )
 
 target_link_libraries(
