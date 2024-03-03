@@ -25,18 +25,14 @@ private:
     int m_height = 400;
 
     spry::Shader shader = spry::ShaderManager::mvp_shader();
-    spry::Shader grass_quad_shader;
+    spry::Shader quad_texture_shader;
     spry::Camera m_camera;
     spry::Line x_axis;
     spry::Line y_axis;
     spry::Line z_axis;
     spry::Cuboid cube;
     spry::PlaneMesh plane;
-    spry::Quad quad;
     spry::Transform plane_transform;
-    spry::Texture grass_texture;
-
-    std::vector<glm::vec3> vegetation;
 
 protected:
     void update_frame(float delta_time) override
@@ -53,8 +49,9 @@ protected:
         shader.set_uniform_matrix("view", view);
         draw_axes();
 
-        // shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.9f, 1.0f));
-        // cube.draw();
+        shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.9f, 1.0f));
+        shader.set_uniform_matrix("model", spry::Transform().rotate(get_global_time(), glm::vec3(1.0f, 1.0f, 0.0f)).translate(glm::vec3(0.0f, 1.0f, 0.0f)).get_model());
+        cube.draw();
         // shader.set_uniform_matrix("model", spry::Transform().rotate(glm::radians(get_global_time() * 40), glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f))).get_model());
 
         shader.set_uniform_vec("color", glm::vec4(0.5f, 0.4f, 0.4f, 1.0f));
@@ -62,27 +59,14 @@ protected:
         plane.draw();
 
         check_for_opengl_error();
-        grass_quad_shader.use();
+        quad_texture_shader.use();
         check_for_opengl_error();
-        grass_quad_shader.set_uniform_matrix("view", view);
-        grass_quad_shader.set_uniform_matrix("projection", projection);
+        quad_texture_shader.set_uniform_matrix("view", view);
+        quad_texture_shader.set_uniform_matrix("projection", projection);
         check_for_opengl_error();
 
-        grass_texture.bind();
-        for (auto loc : vegetation) {
-            loc.y += 0.5;
-            float angle = get_signed_angle(glm::vec3(0.0f, 0.0f, 1.0f), glm::normalize(m_camera.m_position), glm::vec3(0.0f, 1.0f, 0.0f));
-
-            auto grass_quad_model = spry::Transform()
-                                        .rotate(angle, glm::vec3(0.0f, 1.0f, 0.0f))
-                                        .translate(loc)
-                                        .scale(glm::vec3(0.5f, 0.5f, 0.5f))
-                                        .get_model();
-            grass_quad_shader.set_uniform_matrix("model", grass_quad_model);
-            quad.draw();
-        }
-
         check_for_opengl_error();
+        std::cout << 1.0f / delta_time << "\n";
         // close_window();
     }
 
@@ -155,22 +139,13 @@ protected:
 
 public:
     MyWindow(int width, int height)
-        : Window(width, height, "Blending")
+        : Window(width, height, "Rendering To Texture")
         , m_width(width)
         , m_height(height)
     {
         glEnable(GL_DEPTH_TEST);
-
-        // For the below two lines two work properly we need to sort the objects based on their distance to the camera and 
-        // then draw starting from the farthest one so that all ojects are rendered correctly (The depth buffer does't care 
-        // about transparency)
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-
         set_mouse_capture(true);
-
-        grass_texture.texture_from_file("grass.png", "./examples");
 
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
@@ -178,29 +153,43 @@ public:
 
         plane.load(10.0f, 10.0f, 10, 13);
         plane_transform
-            .translate(glm::vec3(-5.0f, 0.0f, 5.0f))
+            .translate(glm::vec3(-5.0f, -5.0f, 5.0f))
             .rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
         z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
 
-        vegetation.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
-        vegetation.push_back(glm::vec3(1.5f, 0.0f, 0.51f));
-        vegetation.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
-        vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
-        vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
+        uint frame_buffer;
+        glGenFramebuffers(1, &frame_buffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 
-        grass_quad_shader.set_shader_code(
+        uint screen_texture;
+        glGenTextures(1, &screen_texture);
+        glBindTexture(GL_TEXTURE_2D, screen_texture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screen_texture, 0);
+
+        uint render_buffer;
+        glGenRenderbuffers(1, &render_buffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_width, m_height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        quad_texture_shader.set_shader_code(
             R"(
                 #version 330 core
                 layout (location = 0) in vec3 position;
                 layout (location = 1) in vec3 normal;
                 layout (location = 2) in vec2 tex_coord;
-
-                uniform mat4 model;
-                uniform mat4 view;
-                uniform mat4 projection;
 
                 out vec2 texCoord;
 
@@ -229,18 +218,18 @@ public:
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
-//     w.start();
+    MyWindow w(800, 600);
+    w.start();
 
-//     return 0;
-// }
+    return 0;
+}
 
-// /* ray tracer
-//  * fogs
-//  * sky box
-//  * text
-//  */
+/* ray tracer
+ * fogs
+ * sky box
+ * text
+*/
