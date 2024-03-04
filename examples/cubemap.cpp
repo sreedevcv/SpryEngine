@@ -18,6 +18,7 @@
 #include "Sphere.hpp"
 
 #include "utils.hpp"
+#include "CubeMap.hpp"
 
 class MyWindow : public spry::Window {
 private:
@@ -25,7 +26,6 @@ private:
     int m_height = 400;
 
     spry::Shader shader = spry::ShaderManager::mvp_shader();
-    spry::Shader quad_texture_shader;
     spry::Camera m_camera;
     spry::Line x_axis;
     spry::Line y_axis;
@@ -34,47 +34,30 @@ private:
     spry::Sphere sphere;
     spry::PlaneMesh plane;
     spry::Transform plane_transform;
-    spry::Quad quad;
-
-    unsigned int frame_buffer;
-    unsigned int screen_texture;
+    spry::CubeMap skybox;
 
 protected:
     void update_frame(float delta_time) override
     {
         process_input(delta_time);
-        // First pass
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-        glClearColor(0.4f, 0.5f, 0.4f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Drawing First Scene
+        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
         auto model = glm::mat4(1.0f);
-        auto view = glm::lookAt(glm::vec3(1.0f, 1.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        auto view = m_camera.get_view_matrix();
         auto projection = m_camera.get_projection_matrix();
+
+        skybox.draw(glm::mat4(glm::mat3(view)), projection);
 
         shader.use();
         shader.set_uniform_matrix("projection", projection);
         shader.set_uniform_matrix("view", view);
         draw_axes();
 
-        shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.9f, 1.0f));
+        shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.7f, 1.0f));
         shader.set_uniform_matrix("model", spry::Transform().rotate(get_global_time(), glm::vec3(1.0f, 1.0f, 0.0f)).translate(glm::vec3(1.0f, 1.0f, 1.0f)).get_model());
         sphere.draw();
-        check_for_opengl_error();
-
-        // Second Pass
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-        view = m_camera.get_view_matrix();
-        quad_texture_shader.use();
-        quad_texture_shader.set_uniform_matrix("view", view);
-        quad_texture_shader.set_uniform_matrix("projection", projection);
-        quad_texture_shader.set_uniform_matrix("model", spry::Transform().get_model());
-        glBindTexture(GL_TEXTURE_2D, screen_texture);
-        quad.draw();
 
         shader.use();
         shader.set_uniform_matrix("view", view);
@@ -83,7 +66,7 @@ protected:
         plane.draw();
 
         check_for_opengl_error();
-        std::cout << 1.0f / delta_time << "\n";
+        // std::cout << 1.0f / delta_time << "\n";
         // close_window();
     }
 
@@ -178,74 +161,32 @@ public:
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
         z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
 
-        glGenFramebuffers(1, &frame_buffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-
-        glGenTextures(1, &screen_texture);
-        glBindTexture(GL_TEXTURE_2D, screen_texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screen_texture, 0);
-
-        unsigned int render_buffer;
-        glGenRenderbuffers(1, &render_buffer);
-        glBindRenderbuffer(GL_RENDERBUFFER, render_buffer);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_width, m_height);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer);
-
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cout << "ERROR::FRAMEBUFFER::Framebuffer is not complete\n";
-        }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        quad_texture_shader.set_shader_code(
-            R"(
-                #version 330 core
-                layout (location = 0) in vec3 position;
-                layout (location = 1) in vec3 normal;
-                layout (location = 2) in vec2 tex_coord;
-
-                out vec2 texCoord;
-
-                uniform mat4 model;
-                uniform mat4 view;
-                uniform mat4 projection;
-
-                void main() {
-                    gl_Position = projection * view * model * vec4(position, 1.0);
-                    texCoord = tex_coord;
-                }
-            )",
-
-            R"(
-                #version 330 core
-
-                out vec4 frag_color;
-                in vec2 texCoord;
-                uniform sampler2D texture1;
-
-                void main() {
-                    vec4 tex_color = texture(texture1, texCoord);
-                    frag_color = tex_color;
-                }
-            )");
+        const char* paths[] = {
+            "../examples/skybox/right.jpg",
+            "../examples/skybox/left.jpg",
+            "../examples/skybox/top.jpg",
+            "../examples/skybox/bottom.jpg",
+            "../examples/skybox/front.jpg",
+            "../examples/skybox/back.jpg",
+        };
+        skybox.load_cube_map(paths);
 
         check_for_opengl_error();
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    // stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
-//     w.start();
+    MyWindow w(800, 600);
+    w.start();
 
-//     return 0;
-// }
+    return 0;
+}
+
+/* ray tracer
+ * fogs
+ * sky box
+ * text
+ */

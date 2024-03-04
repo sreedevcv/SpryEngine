@@ -102,7 +102,6 @@ void spry::BasicMesh::draw(GLenum mode)
         glDrawArrays(mode, 0, m_vertex_count);
     }
     glBindVertexArray(0);
-    check_for_opengl_error();
 }
 
 void spry::BasicMesh::operator=(BasicMesh& mesh)

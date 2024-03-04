@@ -63,7 +63,13 @@ void spry::Shader::compile_shader_code(const char* vertex, const char* fragment)
                 std::cout << "[ERROR]::LINK::";
             } else {
                 glGetShaderInfoLog(shader, 1024, nullptr, log);
-                std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::" << mVert_shader_path << "::";
+                // std::cout << "[ERROR]::" << (is_vert_shader ? "VERT" : "FRAG") << "::" << mVert_shader_path << "::";
+                std::cout << "[ERROR]::";
+                if (is_vert_shader) {
+                    std::cout << "VERT::\n" << vertex << std::endl; 
+                } else {
+                    std::cout << "FRAG::\n" << fragment << std::endl; 
+                }
             }
             std::cout << log << std::endl;
         }
@@ -94,44 +100,44 @@ void spry::Shader::use()
     glUseProgram(ID);
 }
 
-void spry::Shader::set_uniform_float(const char* name, float value)
+void spry::Shader::set_uniform_float(const char* name, const float value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform1f(loc, value);
 }
 
-void spry::Shader::set_uniform_matrix(const char* name, glm::mat4& value)
+void spry::Shader::set_uniform_matrix(const char* name, const glm::mat4& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(value));
 }
 
-void spry::Shader::set_uniform_vec(const char* name, glm::vec3&& value)
+void spry::Shader::set_uniform_vec(const char* name, const glm::vec3&& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
 
-void spry::Shader::set_uniform_vec(const char* name, glm::vec4&& value)
+void spry::Shader::set_uniform_vec(const char* name, const glm::vec4&& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-void spry::Shader::set_uniform_vec(const char* name, glm::vec3& value)
+void spry::Shader::set_uniform_vec(const char* name, const glm::vec3& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
-void spry::Shader::set_uniform_int(const char* name, int value) const
+void spry::Shader::set_uniform_int(const char* name, const int value) const
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform1i(loc, value);
 }
 
-void spry::Shader::set_uniform_vec(const char* name, glm::vec4& value)
+void spry::Shader::set_uniform_vec(const char* name, const glm::vec4& value)
 {
     int loc = glGetUniformLocation(ID, name);
     glUniform4fv(loc, 1, glm::value_ptr(value));

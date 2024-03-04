@@ -61,12 +61,9 @@ protected:
         shader.set_uniform_matrix("model", plane_transform.get_model());
         plane.draw();
 
-        check_for_opengl_error();
         grass_quad_shader.use();
-        check_for_opengl_error();
         grass_quad_shader.set_uniform_matrix("view", view);
         grass_quad_shader.set_uniform_matrix("projection", projection);
-        check_for_opengl_error();
 
         grass_texture.bind();
         for (auto loc : vegetation) {
@@ -170,7 +167,7 @@ public:
 
         set_mouse_capture(true);
 
-        grass_texture.texture_from_file("grass.png", "./examples");
+        grass_texture.texture_from_file("grass.png");
 
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
