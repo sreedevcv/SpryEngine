@@ -32,9 +32,9 @@ private:
     spry::Line z_axis;
     spry::Cuboid cube;
     spry::Sphere sphere;
-    spry::PlaneMesh plane;
-    spry::Transform plane_transform;
     spry::CubeMap skybox;
+    spry::Shader reflection_shader;
+    spry::Shader refraction_shader;
 
 protected:
     void update_frame(float delta_time) override
@@ -48,25 +48,35 @@ protected:
         auto view = m_camera.get_view_matrix();
         auto projection = m_camera.get_projection_matrix();
 
-        skybox.draw(glm::mat4(glm::mat3(view)), projection);
-
         shader.use();
         shader.set_uniform_matrix("projection", projection);
         shader.set_uniform_matrix("view", view);
         draw_axes();
 
-        shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.7f, 1.0f));
-        shader.set_uniform_matrix("model", spry::Transform().rotate(get_global_time(), glm::vec3(1.0f, 1.0f, 0.0f)).translate(glm::vec3(1.0f, 1.0f, 1.0f)).get_model());
+        check_for_opengl_error();
+
+        // shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.7f, 1.0f));
+        reflection_shader.use();
+        check_for_opengl_error();
+        reflection_shader.set_uniform_matrix("model", spry::Transform().rotate(get_global_time(), glm::vec3(1.0f, 1.0f, 0.0f)).translate(glm::vec3(1.0f, 1.0f, 1.0f)).get_model());
+        reflection_shader.set_uniform_matrix("view", view);
+        reflection_shader.set_uniform_matrix("projection", projection);
+        reflection_shader.set_uniform_vec("camera_pos", m_camera.m_position);
         sphere.draw();
 
-        shader.use();
-        shader.set_uniform_matrix("view", view);
-        shader.set_uniform_vec("color", glm::vec4(0.5f, 0.4f, 0.4f, 1.0f));
-        shader.set_uniform_matrix("model", plane_transform.get_model());
-        plane.draw();
+        check_for_opengl_error();
+
+        refraction_shader.use();
+        refraction_shader.set_uniform_matrix("model", spry::Transform().translate(glm::vec3(-3.0f, 0.0f, 0.0f)).get_model());
+        refraction_shader.set_uniform_matrix("view", view);
+        refraction_shader.set_uniform_matrix("projection", projection);
+        refraction_shader.set_uniform_vec("camera_pos", m_camera.m_position);
+        cube.draw();
+
+        skybox.draw(glm::mat4(glm::mat3(view)), projection);
 
         check_for_opengl_error();
-        // std::cout << 1.0f / delta_time << "\n";
+        std::cout << 1.0f / delta_time << "\n";
         // close_window();
     }
 
@@ -144,22 +154,20 @@ public:
         , m_height(height)
     {
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+
         set_mouse_capture(true);
 
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
         m_camera.m_position = glm::vec3(0.0f, 1.0f, 3.0f);
 
-        plane.load(10.0f, 10.0f, 10, 13);
-        sphere.load(1.0f, 20, 20);
-        plane_transform
-            .translate(glm::vec3(-5.0f, -5.0f, 5.0f))
-            .rotate(glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
         z_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1000.0f));
+
+        sphere.load(1.0f, 20, 20);
 
         const char* paths[] = {
             "../examples/skybox/right.jpg",
@@ -170,6 +178,64 @@ public:
             "../examples/skybox/back.jpg",
         };
         skybox.load_cube_map(paths);
+
+        const char* vertex_shader = R"(
+                #version 330 core
+                layout (location = 0) in vec3 position;
+                layout (location = 1) in vec3 normal;
+
+                out vec3 pos;
+                out vec3 norm;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                void main() {
+                    pos = vec3(model * vec4(position, 1.0));
+                    norm = mat3(transpose(inverse(model))) * normal;
+                    gl_Position = projection * view * model * vec4(position, 1.0);
+                }
+            )";
+
+        reflection_shader.set_shader_code(
+            vertex_shader,
+            R"(
+                #version 330 core
+                out vec4 frag_color;
+
+                in vec3 pos;
+                in vec3 norm;
+
+                uniform vec3 camera_pos;
+                uniform samplerCube skybox;
+
+                void main() {
+                    vec3 incident = normalize(pos - camera_pos);
+                    vec3 reflected = reflect(incident, normalize(norm));
+                    frag_color = vec4(texture(skybox, reflected).rgb, 1.0);
+                }
+            )");
+
+        refraction_shader.set_shader_code(
+            vertex_shader,
+            R"(
+                    #version 330 core
+                    out vec4 frag_color;
+
+                    in vec3 pos;
+                    in vec3 norm;
+
+                    uniform vec3 camera_pos;
+                    uniform samplerCube skybox;
+
+                    void main() {
+                        float ratio = 1.0 / 1.52;
+                        vec3 incident = normalize(pos - camera_pos);
+                        vec3 refracted = refract(incident, normalize(norm), ratio);
+                        frag_color = vec4(texture(skybox, refracted).rgb, 1.0);
+                    }
+                )");
 
         check_for_opengl_error();
     }

@@ -19,7 +19,9 @@ spry::CubeMap::CubeMap()
 
             void main() {
                 tex_coords = position;
-                gl_Position = projection * view * vec4(position, 1.0);
+                vec4 pos = projection * view * vec4(position, 1.0);
+                gl_Position = pos.xyww; // makes it so that depth(z) is always one, so that will be rendered last. 
+                // The depth function should be changed to GL_LEQUAL to work properly 
             }
         )",
         R"(
@@ -111,11 +113,14 @@ void spry::CubeMap::load_cube_map(const char* texture_paths[])
 
 void spry::CubeMap::draw(const glm::mat4& view, const glm::mat4& projection)
 {
-    glDepthMask(GL_FALSE);
     m_shader.use();
     m_shader.set_uniform_matrix("view", view);
     m_shader.set_uniform_matrix("projection", projection);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture_id);
     m_mesh.draw();
-    glDepthMask(GL_TRUE);
+}
+
+void spry::CubeMap::bind()
+{
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture_id);
 }
