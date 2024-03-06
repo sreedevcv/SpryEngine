@@ -107,6 +107,7 @@ add_executable(spryengine
     "examples/blending.cpp"
     "examples/textureRendering.cpp"
     "examples/cubemap.cpp"
+    "examples/advanced_glsl.cpp"
 )
 
 target_link_libraries(

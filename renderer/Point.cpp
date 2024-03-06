@@ -12,8 +12,6 @@ spry::Point::Point(std::vector<glm::vec3>& points)
 void spry::Point::load(std::vector<glm::vec3>& points)
 {
     std::vector<int> format = {3};
-    // std::vector<float> p(points.begin(), points.end());
-    // m_mesh.load_data(p, format);
     m_mesh.load_data(points, format);
 }
 

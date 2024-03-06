@@ -13,9 +13,8 @@
 #include "Line.hpp"
 #include "Transform.hpp"
 #include "PlaneMesh.hpp"
-#include "Quad.hpp"
-#include "Texture.hpp"
 #include "Sphere.hpp"
+#include "Point.hpp"
 
 #include "utils.hpp"
 #include "CubeMap.hpp"
@@ -32,9 +31,8 @@ private:
     spry::Line z_axis;
     spry::Cuboid cube;
     spry::Sphere sphere;
-    spry::CubeMap skybox;
-    spry::Shader reflection_shader;
-    spry::Shader refraction_shader;
+    spry::Shader point_shader;
+    spry::Point points;
 
 protected:
     void update_frame(float delta_time) override
@@ -43,6 +41,8 @@ protected:
 
         glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+        // draw_points();
 
         auto model = glm::mat4(1.0f);
         auto view = m_camera.get_view_matrix();
@@ -55,28 +55,15 @@ protected:
 
         check_for_opengl_error();
 
-        // shader.set_uniform_vec("color", glm::vec4(0.9f, 0.7f, 0.7f, 1.0f));
-        reflection_shader.use();
+        point_shader.use();
         check_for_opengl_error();
-        reflection_shader.set_uniform_matrix("model", spry::Transform().rotate(get_global_time(), glm::vec3(1.0f, 1.0f, 0.0f)).translate(glm::vec3(1.0f, 1.0f, 1.0f)).get_model());
-        reflection_shader.set_uniform_matrix("view", view);
-        reflection_shader.set_uniform_matrix("projection", projection);
-        reflection_shader.set_uniform_vec("camera_pos", m_camera.m_position);
-        sphere.draw();
+        point_shader.set_uniform_matrix("model", spry::Transform().get_model());
+        point_shader.set_uniform_matrix("view", view);
+        point_shader.set_uniform_matrix("projection", projection);
+        points.draw();
 
         check_for_opengl_error();
 
-        refraction_shader.use();
-        refraction_shader.set_uniform_matrix("model", spry::Transform().translate(glm::vec3(-3.0f, 0.0f, 0.0f)).get_model());
-        refraction_shader.set_uniform_matrix("view", view);
-        refraction_shader.set_uniform_matrix("projection", projection);
-        refraction_shader.set_uniform_vec("camera_pos", m_camera.m_position);
-        cube.draw();
-
-        skybox.draw(glm::mat4(glm::mat3(view)), projection);
-
-        check_for_opengl_error();
-        std::cout << 1.0f / delta_time << "\n";
         // close_window();
     }
 
@@ -147,6 +134,27 @@ protected:
         z_axis.draw();
     }
 
+    void draw_points()
+    {
+        auto model = glm::mat4(1.0f);
+        auto view = m_camera.get_view_matrix();
+        auto projection = m_camera.get_projection_matrix();
+
+        shader.use();
+        shader.set_uniform_matrix("projection", projection);
+        shader.set_uniform_matrix("view", view);
+        draw_axes();
+
+        check_for_opengl_error();
+
+        point_shader.use();
+        check_for_opengl_error();
+        point_shader.set_uniform_matrix("model", spry::Transform().get_model());
+        point_shader.set_uniform_matrix("view", view);
+        point_shader.set_uniform_matrix("projection", projection);
+        points.draw();
+    }
+
 public:
     MyWindow(int width, int height)
         : Window(width, height, "Rendering To Texture")
@@ -155,6 +163,7 @@ public:
     {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
+        glEnable(GL_PROGRAM_POINT_SIZE);
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
         set_mouse_capture(true);
@@ -169,84 +178,51 @@ public:
 
         sphere.load(1.0f, 20, 20);
 
-        const char* paths[] = {
-            "../examples/skybox/right.jpg",
-            "../examples/skybox/left.jpg",
-            "../examples/skybox/top.jpg",
-            "../examples/skybox/bottom.jpg",
-            "../examples/skybox/front.jpg",
-            "../examples/skybox/back.jpg",
+        std::vector<glm::vec3> point_locs = {
+            glm::vec3(1.0f, 1.0f, 0.0f),
+            glm::vec3(-1.0f, -1.0f, 0.0f),
+            glm::vec3(1.0f, 1.0f, 1.0f),
         };
-        skybox.load_cube_map(paths);
+        points.load(point_locs);
 
-        const char* vertex_shader = R"(
+        point_shader.set_shader_code(
+            R"(
                 #version 330 core
                 layout (location = 0) in vec3 position;
-                layout (location = 1) in vec3 normal;
-
-                out vec3 pos;
-                out vec3 norm;
 
                 uniform mat4 model;
                 uniform mat4 view;
                 uniform mat4 projection;
 
                 void main() {
-                    pos = vec3(model * vec4(position, 1.0));
-                    norm = mat3(transpose(inverse(model))) * normal;
                     gl_Position = projection * view * model * vec4(position, 1.0);
+                    gl_PointSize = gl_Position.z;
                 }
-            )";
-
-        reflection_shader.set_shader_code(
-            vertex_shader,
+            )",
             R"(
                 #version 330 core
                 out vec4 frag_color;
 
-                in vec3 pos;
-                in vec3 norm;
-
-                uniform vec3 camera_pos;
-                uniform samplerCube skybox;
-
                 void main() {
-                    vec3 incident = normalize(pos - camera_pos);
-                    vec3 reflected = reflect(incident, normalize(norm));
-                    frag_color = vec4(texture(skybox, reflected).rgb, 1.0);
+                    frag_color = vec4(0.8, 0.9, 0.7, 1.0);
                 }
             )");
-
-        refraction_shader.set_shader_code(
-            vertex_shader,
-            R"(
-                    #version 330 core
-                    out vec4 frag_color;
-
-                    in vec3 pos;
-                    in vec3 norm;
-
-                    uniform vec3 camera_pos;
-                    uniform samplerCube skybox;
-
-                    void main() {
-                        float ratio = 1.0 / 1.52;
-                        vec3 incident = normalize(pos - camera_pos);
-                        vec3 refracted = refract(incident, normalize(norm), ratio);
-                        frag_color = vec4(texture(skybox, refracted).rgb, 1.0);
-                    }
-                )");
-
         check_for_opengl_error();
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     // stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    // stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
-//     w.start();
+    MyWindow w(800, 600);
+    w.start();
 
-//     return 0;
-// }
+    return 0;
+}
+
+/* ray tracer
+ * fogs
+ * sky box
+ * text
+ */
