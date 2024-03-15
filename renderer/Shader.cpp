@@ -1,9 +1,10 @@
 #include "Shader.hpp"
 
-spry::Shader::Shader(const char* vertShaderSource, const char* fragShaderSource)
+spry::Shader::Shader(const char* vertShaderSource, const char* fragShaderSource, const char* geom_shader_source)
     : mVert_shader_path(vertShaderSource)
     , mFrag_shader_path(fragShaderSource)
     , mHasCompiled(false)
+    , mGeom_shader_path(geom_shader_source)
 {
 }
 
@@ -32,6 +33,8 @@ void spry::Shader::compile()
 
     std::stringstream vertStream;
     std::stringstream fragStream;
+    std::stringstream geomStream;
+
     vertStream << vertFile.rdbuf();
     fragStream << fragFile.rdbuf();
 
@@ -40,13 +43,20 @@ void spry::Shader::compile()
 
     const char* vertCodeStr = vertCode.c_str();
     const char* fragCodeStr = fragCode.c_str();
+    const char* geomCodeStr = nullptr;
 
-    compile_shader_code(vertCodeStr, fragCodeStr);
+    if (mGeom_shader_path) {
+        std::ifstream geomfile(mGeom_shader_path);
+        geomStream << geomfile.rdbuf();
+        geomCodeStr = geomStream.str().c_str();
+    }
+
+    compile_shader_code(vertCodeStr, fragCodeStr, geomCodeStr);
 
     check_for_opengl_error();
 }
 
-void spry::Shader::compile_shader_code(const char* vertex, const char* fragment)
+void spry::Shader::compile_shader_code(const char* vertex, const char* fragment, const char* geometry)
 {
     const auto getError = [&](unsigned int shader, bool is_vert_shader = true, bool is_program = false) {
         int success;
@@ -85,14 +95,28 @@ void spry::Shader::compile_shader_code(const char* vertex, const char* fragment)
     glCompileShader(fragShader);
     getError(fragShader, false);
 
+    unsigned int geomShader;
+    if (geometry) {
+        geomShader = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geomShader, 1, &geometry, nullptr);
+        glCompileShader(geomShader);
+        getError(geomShader, false);
+    }
+
     ID = glCreateProgram();
     glAttachShader(ID, vertShader);
     glAttachShader(ID, fragShader);
+    if (geometry) {
+        glAttachShader(ID, geomShader);
+    }
     glLinkProgram(ID);
     getError(ID, false, true);
 
     glDeleteShader(vertShader);
     glDeleteShader(fragShader);
+    if (geometry) {
+        glDeleteShader(geomShader);
+    }
 }
 
 void spry::Shader::use()
@@ -143,16 +167,17 @@ void spry::Shader::set_uniform_vec(const char* name, const glm::vec4& value)
     glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-void spry::Shader::set_shader_paths(const char* vert_shader_path, const char* frag_shader_path)
+void spry::Shader::set_shader_paths(const char* vert_shader_path, const char* frag_shader_path, const char* geom_shader_path)
 {
     mVert_shader_path = vert_shader_path;
     mFrag_shader_path = frag_shader_path;
+    mGeom_shader_path = geom_shader_path;
     mHasCompiled = false;
 }
 
-void spry::Shader::set_shader_code(const char* vert_shader_source, const char* frag_shader_source)
+void spry::Shader::set_shader_code(const char* vert_shader_source, const char* frag_shader_source, const char* geom_shader_source)
 {
-    compile_shader_code(vert_shader_source, frag_shader_source);
+    compile_shader_code(vert_shader_source, frag_shader_source, geom_shader_source);
     mHasCompiled = true;
 }
 
@@ -219,10 +244,10 @@ spry::Shader spry::ShaderManager::mvp_shader()
     return shader;
 }
 
-spry::Shader spry::ShaderManager::create_shader(const char* vert_code, const char* frag_code)
+spry::Shader spry::ShaderManager::create_shader(const char* vert_code, const char* frag_code, const char *geom_code)
 {
     Shader shader("", "");
     shader.mHasCompiled = true;
-    shader.compile_shader_code(vert_code, frag_code);
+    shader.compile_shader_code(vert_code, frag_code, geom_code);
     return shader;
 }

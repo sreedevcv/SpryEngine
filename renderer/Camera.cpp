@@ -18,7 +18,7 @@ glm::mat4 spry::Camera::get_view_matrix()
 
 glm::mat4 spry::Camera::get_projection_matrix()
 {
-    return glm::perspective(glm::radians(m_zoom), aspect_ratio, 0.1f, 1000.0f);
+    return glm::perspective(glm::radians(m_zoom), aspect_ratio, m_near_point, m_far_point);
 }
 
 void spry::Camera::set_screen_size(const int width, const int height)
