@@ -26,52 +26,6 @@
 #include "utils.hpp"
 #include "CubeMap.hpp"
 
-struct ColorPoint {
-    spry::BasicMesh m_mesh;
-    spry::Point point;
-
-    ColorPoint(const char* path)
-    {
-        std::ifstream file(path);
-        std::vector<float> data;
-
-        std::cout << "Loading data\n";
-        int count = 0;
-        while (file.good()) {
-            float d;
-            // for (int i = 0; i < 6; i++) {
-            //     file >> d;
-            //     data.push_back(d);
-            // }
-            count++;
-
-            file >> d;
-            data.push_back(d/10);
-            file >> d;
-            data.push_back(d/10);
-            file >> d;
-            data.push_back(d/10);
-
-            file >> d;
-            data.push_back(d);
-            file >> d;
-            data.push_back(d);
-            file >> d;
-            data.push_back(d);
-        }
-        std::cout << count << " Data loaded\n";
-
-        std::vector<int> format = { 3, 3 };
-        m_mesh.load_data(data, format);
-    }
-
-    void draw()
-    {
-        // m_mesh.draw(GL_TRIANGLE_STRIP_ADJACENCY);
-        m_mesh.draw(GL_POINT);
-    }
-};
-
 class MyWindow : public spry::Window {
 private:
     int m_width = 600;
@@ -85,17 +39,13 @@ private:
     spry::Cuboid cube;
     spry::Sphere sphere;
     spry::CubeMap skybox;
-    spry::Shader reflection_shader;
-    spry::Shader refraction_shader;
+
+    spry::Point points;
     spry::Shader point_shader;
 
-    float x_angle = 0.0f;
-    float y_angle = 0.0f;
-    float z_angle = 0.0f;
-    float point_size = 1.0f;
-
     bool update_camera = true;
-    ColorPoint points_to_render;
+
+    spry::Shader explode_shader;
 
 protected:
     void update_frame(float delta_time) override
@@ -113,17 +63,20 @@ protected:
         shader.set_uniform_matrix("view", view);
         draw_axes();
 
-        spry::Transform transform;
-        transform.rotate(glm::radians(x_angle), glm::vec3(1.0f, 0.0f, 0.0f))
-            .rotate(glm::radians(y_angle), glm::vec3(0.0f, 1.0f, 0.0f))
-            .rotate(glm::radians(z_angle), glm::vec3(0.0f, 0.0f, 1.0f));
 
         point_shader.use();
+        point_shader.set_uniform_matrix("model", model);
         point_shader.set_uniform_matrix("projection", projection);
         point_shader.set_uniform_matrix("view", view);
-        point_shader.set_uniform_matrix("model", transform.get_model());
+        points.draw();
 
-        points_to_render.draw();
+        explode_shader.use();
+        explode_shader.set_uniform_matrix("model", model);
+        explode_shader.set_uniform_matrix("projection", projection);
+        explode_shader.set_uniform_matrix("view", view);
+        explode_shader.set_uniform_vec("color", glm::vec4(1.0f, 0.5f, 0.8f, 1.0f));
+        explode_shader.set_uniform_float("time", get_global_time());
+        sphere.draw();
 
         check_for_opengl_error();
         // close_window();
@@ -166,7 +119,7 @@ protected:
 
     void on_mouse_move(double x_pos_in, double y_pos_in) override
     {
-        if(!update_camera)
+        if (!update_camera)
             return;
         float x_pos = static_cast<float>(x_pos_in);
         float y_pos = static_cast<float>(y_pos_in);
@@ -218,20 +171,13 @@ protected:
         ImGui::Begin("Options");
         ImGui::Text("FPS: %f", 1.0f / delta_time);
         ImGui::Text("Pos: %f, %f %f", m_camera.m_position.x, m_camera.m_position.y, m_camera.m_position.z);
-        ImGui::Text("Angles: %f, %f %f", x_angle, y_angle, z_angle);
         // ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
         // ImGui::Checkbox("Another Window", &show_another_window);
 
         ImGui::SliderFloat("speed", &m_camera.m_speed, 0.0f, 1000.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::SliderFloat("x angle", &x_angle, 0.0f, 360.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::SliderFloat("y angle", &y_angle, 0.0f, 360.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::SliderFloat("z angle", &z_angle, 0.0f, 360.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::SliderFloat("Point Size", &point_size, 1.0f, 10.0f);
-        // ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        // ImGui::ColorEdit3("clear color", (float*&clear_color); // Edit 3 floats representing a color
 
-        if (ImGui::Button("Change"))
-            glPointSize(point_size);
-        // ImGui::Text("counter = %d", counter);
+        // ImGui::Text("counter =%d", counter);
         ImGui::End();
 
         ImGui::Render();
@@ -243,21 +189,18 @@ public:
         : Window(width, height, "Point Rendering")
         , m_width(width)
         , m_height(height)
-    , points_to_render("../examples/file - Copy.txt")
     {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LEQUAL);
-        glClearColor(0.75, 0.75, 0.75, 1.0f);
+        glClearColor(0.3, 0.3, 0.3, 1.0f);
 
         set_mouse_capture(true);
         glPointSize(1.0f);
 
         m_camera.set_screen_size(width, height);
         m_camera.mouse_data.first_mouse = true;
-        
+
         m_camera.m_far_point = 2000.0f;
-        // m_camera.m_position = glm::vec3(182.0f, 354.0f, 344.0f);
-        // m_camera.m_position = glm::vec3(0.0f, 0.0f, 0.0f);
 
         x_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1000.0f, 0.0f, 0.0f));
         y_axis.set_end_points(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1000.0f, 0.0f));
@@ -265,13 +208,19 @@ public:
 
         sphere.load(1.0f, 20, 20);
 
+        std::vector<glm::vec3> point_data = {
+            { 1.0f, 1.0f, 0.0f },
+            { 1.0f, -1.0f, 0.0f },
+            { -1.0f, 1.0f, 0.0f },
+            // {-1.0f, -1.0f, 0.0f},
+        };
+
+        points.load(point_data);
+
         point_shader.set_shader_code(
             R"(
-                #version 330 core
+                #version 460 core
                 layout (location = 0) in vec3 position;
-                layout (location = 1) in vec3 color;
-
-                out vec3 point_color;
 
                 uniform mat4 model;
                 uniform mat4 view;
@@ -279,47 +228,93 @@ public:
 
                 void main() {
                     gl_Position = projection * view * model * vec4(position, 1.0);
-                    point_color = color;
                 }
             )",
             R"(
-                #version 330 core
+                #version 460 core
                 out vec4 frag_color;
 
-                in vec3 point_color;
-
                 void main() {
-                    frag_color = vec4(point_color, 1.0);
+                    frag_color = vec4(1.0f, 0.9f, 0.9f, 1.0f);
                 }
-            )"
-            );
+            )",
 
-        /*
-                    R"(
-                #version 330 core
+            R"(
+                #version 460 core
                 layout (points) in;
-                layout (triangle_strip, max_vertices=1) out;
-                
-                in vec3 p_color;
-                out vec3 point_olor;
+                layout (line_strip, max_vertices=2) out;
 
                 void main() {
-                    point_color = p_color;
-
-                    gl_Position = gl_in[0].gl_Position;
+                    gl_Position = gl_in[0].gl_Position + vec4(-1.0, 0.0, 0.0, 0.0);
+                    EmitVertex();
+                    gl_Position = gl_in[0].gl_Position + vec4(1.0, 0.0, 0.0, 0.0);
                     EmitVertex();
 
                     EndPrimitive();
                 }
+            )");
+
+        explode_shader.set_shader_code(
+            R"(
+                #version 330
+                layout (location = 0) in vec3 apos;
+
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 projection;
+
+                void main() {
+                    gl_Position = projection * view * model * vec4(apos, 1.0);
+                }
+            )",
+            R"(
+                #version 330 core 
+
+                out vec4 frag_color;
+
+                uniform vec4 color;
+                
+                void main() {
+                    frag_color = color;
+                }
+            )",
+            R"(
+                #version 330 core
+                layout (triangles) in;
+                layout (triangle_strip, max_vertices=3) out;
+
+                uniform float time;
+
+                vec3 get_normal() {
+                    vec3 a = vec3(gl_in[0].gl_Position) - vec3(gl_in[1].gl_Position);
+                    vec3 b = vec3(gl_in[2].gl_Position) - vec3(gl_in[1].gl_Position);
+                    return normalize(cross(a, b));
+                }
+
+                vec4 explode(vec4 position, vec3 normal) {
+                    float magnitude = 2.0;
+                    vec3 direction = normal * (sin(time) + 1.0) / 2.0 * magnitude;
+                    return position + vec4(direction, 0.0);
+                }
+
+                void main() {
+                    vec3 normal = get_normal();
+                    gl_Position = explode(gl_in[0].gl_Position, normal);
+                    EmitVertex();
+                    gl_Position = explode(gl_in[1].gl_Position, normal);
+                    EmitVertex();
+                    gl_Position = explode(gl_in[2].gl_Position, normal);
+                    EmitVertex();
+                    EndPrimitive();
+                }
             )"
-        */
+        );
 
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
         (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-        // ImGui::StyleColorsDark();
         ImGui::StyleColorsLight();
         ImGui_ImplGlfw_InitForOpenGL(get_window(), true);
         ImGui_ImplOpenGL3_Init();
@@ -328,13 +323,12 @@ public:
     }
 };
 
-// int main(int argc, char** argv)
-// {
-//     // stbi_set_flip_vertically_on_load(true);
+int main(int argc, char** argv)
+{
+    // stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(1200, 1000);
-//     w.start();
+    MyWindow w(1200, 1000);
+    w.start();
 
-//     return 0;
-// }
-// 'C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\14.38.33130\bin\Hostx64\x64\cl.exe'
+    return 0;
+}

@@ -30,6 +30,8 @@ public:
     float m_speed = 10.0f;
     float m_mouse_sensitivity = 0.1f;
     float m_zoom = 45.0f;
+    float m_near_point = 0.1f;
+    float m_far_point = 1000.0f;
 
     Camera();
     ~Camera() = default;

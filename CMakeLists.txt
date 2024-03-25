@@ -50,6 +50,29 @@ set(GLM_BUILD_TESTS OFF)
 set(BUILD_SHARED_LIBS OFF)
 FetchContent_MakeAvailable(glm)
 
+# IMGUI
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui
+    GIT_TAG fbf45ad149b10ff8d9cb97aefe0dc5a9562fd66e
+)
+FetchContent_MakeAvailable(imgui)
+
+include_directories(build/_deps/imgui-src)
+include_directories(build/_deps/imgui-src/backends)
+
+add_library(imgui STATIC
+    build/_deps/imgui-src/imgui.cpp 
+    build/_deps/imgui-src/imgui_demo.cpp 
+    build/_deps/imgui-src/imgui_draw.cpp 
+    build/_deps/imgui-src/imgui_tables.cpp 
+    build/_deps/imgui-src/imgui_widgets.cpp
+    build/_deps/imgui-src/backends/imgui_impl_glfw.cpp
+    build/_deps/imgui-src/backends/imgui_impl_opengl3.cpp 
+)
+
+target_link_libraries(imgui glfw)
+
 # MATH
 # include_directories("math")
 # add_library(math
@@ -108,10 +131,14 @@ add_executable(spryengine
     "examples/textureRendering.cpp"
     "examples/cubemap.cpp"
     "examples/advanced_glsl.cpp"
+
+    "examples/renderPoints.cpp"
+    "examples/geometry_shader.cpp"
 )
 
 target_link_libraries(
    spryengine
    renderer
+   imgui
 #    common
 )

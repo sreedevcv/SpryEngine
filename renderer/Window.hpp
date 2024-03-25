@@ -20,7 +20,7 @@ protected:
     virtual void on_screen_size_change(int width, int height);
 
 public:
-    Window(int width, int height, const char* title);
+    Window(int width, int height, const char* title, bool debug_mode = false);
     virtual ~Window();
 
     bool is_key_pressed(int key);
@@ -31,6 +31,7 @@ public:
 
     void start();
     void close_window();
+    GLFWwindow* get_window();
 };
 
 }

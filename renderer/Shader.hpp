@@ -21,17 +21,18 @@ private:
     unsigned int ID;
     const char* mVert_shader_path;
     const char* mFrag_shader_path;
+    const char* mGeom_shader_path;
     bool mHasCompiled = false;
 
-    void compile_shader_code(const char* vertex, const char* fragment);
+    void compile_shader_code(const char* vertex, const char* fragment, const char* geometry=nullptr);
 
 public:
     Shader();
-    Shader(const char* vert_shader_path, const char* fragShaderSource);
+    Shader(const char* vert_shader_path, const char* fragShaderSource, const char* geom_shader_source=nullptr);
     ~Shader();
 
-    void set_shader_paths(const char* vert_shader_path, const char* frag_shader_path);
-    void set_shader_code(const char* vert_shader_source, const char* frag_shader_source);
+    void set_shader_paths(const char* vert_shader_path, const char* frag_shader_path, const char* geom_shader_path=nullptr);
+    void set_shader_code(const char* vert_shader_source, const char* frag_shader_source, const char* geom_shader_source=nullptr);
     void compile();
 
     void use();
@@ -51,6 +52,6 @@ class ShaderManager {
 public:
     static Shader simple_shader();
     static Shader mvp_shader();
-    static Shader create_shader(const char* vert_code, const char* frag_code);
+    static Shader create_shader(const char* vert_code, const char* frag_code, const char *geom_code=nullptr);
 };
 }

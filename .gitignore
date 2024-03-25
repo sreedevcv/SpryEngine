@@ -1,6 +1,8 @@
 build/
 out/
 Debug/
+Release/
+examples/file.txt
 spryengine
 spryengine.exe
 spryengine.ilk
