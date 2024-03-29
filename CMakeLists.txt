@@ -134,6 +134,7 @@ add_executable(spryengine
 
     "examples/renderPoints.cpp"
     "examples/geometry_shader.cpp"
+    "examples/shadows.cpp"
 )
 
 target_link_libraries(
