@@ -433,12 +433,12 @@ public:
     }
 };
 
-int main(int argc, char** argv)
-{
-    // stbi_set_flip_vertically_on_load(true);
+// int main(int argc, char** argv)
+// {
+//     // stbi_set_flip_vertically_on_load(true);
 
-    MyWindow w(1200, 1000);
-    w.start();
+//     MyWindow w(1200, 1000);
+//     w.start();
 
-    return 0;
-}
+//     return 0;
+// }

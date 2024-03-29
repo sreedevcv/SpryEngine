@@ -30,14 +30,13 @@ void spry::Mesh::draw(const Shader& shader)
             number = std::to_string(heightNr++);
         }
 
-        shader.set_uniform_int(("material." + name + number).c_str(), i);
+        shader.set_uniform_int((name + number).c_str(), i);
         glBindTexture(GL_TEXTURE_2D, m_textures[i].id);
     }
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
     glActiveTexture(GL_TEXTURE0);
 }
 
