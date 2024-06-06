@@ -14,7 +14,7 @@ struct Cube {
     glm::vec4 color;
 };
 
-class GameWindow : public spry::Window {
+class RubiksCubeWindow : public spry::Window {
 private:
     int m_width;
     int m_height;
@@ -49,7 +49,7 @@ private:
     }
 
 public:
-    GameWindow(int width, int height)
+    RubiksCubeWindow(int width, int height)
         : Window(width, height, "Rubiks Cube")
         , m_width(width)
         , m_height(height)
@@ -79,7 +79,7 @@ public:
 
 // int main(int argc, char** argv)
 // {
-//     GameWindow w(800, 600);
+//     RubiksCubeWindow w(800, 600);
 //     w.start();
 //     return 0;
 // }

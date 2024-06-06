@@ -136,6 +136,7 @@ add_executable(spryengine
     "examples/geometry_shader.cpp"
     "examples/shadows.cpp"
     "examples/tree.cpp"
+    "examples/gameOfLife.cpp"
 )
 
 target_link_libraries(

@@ -19,7 +19,7 @@
 
 #include "utils.hpp"
 
-class MyWindow : public spry::Window {
+class TextureWindow : public spry::Window {
 private:
     int m_width = 600;
     int m_height = 400;
@@ -155,7 +155,7 @@ protected:
     }
 
 public:
-    MyWindow(int width, int height)
+    TextureWindow(int width, int height)
         : Window(width, height, "Rendering To Texture")
         , m_width(width)
         , m_height(height)
@@ -244,7 +244,7 @@ public:
 // {
 //     stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
+//     TextureWindow w(800, 600);
 //     w.start();
 
 //     return 0;

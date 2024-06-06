@@ -19,7 +19,7 @@
 #include "utils.hpp"
 
 
-class MyWindow : public spry::Window {
+class BlendingWindow : public spry::Window {
 private:
     int m_width = 600;
     int m_height = 400;
@@ -151,7 +151,7 @@ protected:
     }
 
 public:
-    MyWindow(int width, int height)
+    BlendingWindow(int width, int height)
         : Window(width, height, "Blending")
         , m_width(width)
         , m_height(height)
@@ -230,7 +230,7 @@ public:
 // {
 //     stbi_set_flip_vertically_on_load(true);
 
-//     MyWindow w(800, 600);
+//     BlendingWindow w(800, 600);
 //     w.start();
 
 //     return 0;

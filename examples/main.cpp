@@ -15,7 +15,7 @@
 #include "PlaneMesh.hpp"
 #include "utils.hpp"
 
-class MyWindow : public spry::Window {
+class TestWindow : public spry::Window {
 private:
     int m_width = 600;
     int m_height = 400;
@@ -112,7 +112,7 @@ protected:
     }
 
 public:
-    MyWindow(int width, int height)
+    TestWindow(int width, int height)
         : Window(width, height, "Test")
         , m_width(width)
         , m_height(height)
@@ -135,7 +135,7 @@ public:
 
 int main(int argc, char** argv)
 {
-    MyWindow w(800, 600);
+    TestWindow w(800, 600);
     w.start();
     return 0;
 }

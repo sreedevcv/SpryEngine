@@ -22,8 +22,6 @@ struct Light {
 
 uniform vec4 object_color;
 uniform vec3 view_pos;
-// uniform vec3 light_pos;
-// uniform vec3 light_color;
 
 uniform Material material;
 uniform Light light;
